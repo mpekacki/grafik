@@ -1,0 +1,56 @@
+extends layout
+
+block content
+	a(href='#podsumowanie',name='top')
+		span(class='glyphicon glyphicon-chevron-down')
+		| do podsumowania
+	table(class='table table-bordered table-hover table-condensed')
+		each day, i in days
+			tr(class='active')
+				th
+					h3=day.display_day
+				each judge, x in day.stories[0].comments
+					th(class='text-center' + (judge.on_duty ? ' warning' : ''))=judge.name
+			each story, j in day.stories
+				tr
+					td
+						| #{story.author} - 
+						a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
+						| - #{story.display_date} - #{story.last_comment_count} kom.
+					each entry, k in story.comments
+						td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '') + ' text-center')
+							| #{entry.comment_count}
+	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
+		span(class='glyphicon glyphicon-chevron-up')
+	h4
+		|Podsumowanie za okres od #{date_from} do #{date_to}
+	div(class='row')
+		div(class='col-sm-6 small')
+			if history < max_hist
+				a(href='/' + (history + 1) + '#podsumowanie').
+					<< poprzedni miesiąc
+		div(class='col-sm-6 small text-right')
+			if history > 0 
+				a(href='/' + (history != 1 ? (history - 1) : '') + '#podsumowanie').
+					następny miesiąc >>
+	table(class='table')
+		tr
+			th
+			th.
+				Norma
+			th.
+				Hobby
+			th.
+				Razem
+		each row, r in summary.rows
+			tr
+				td
+					strong=row.name
+				td.
+					#{row.quota_done}/#{row.quota_total} (#{row.quota_percent}%)
+				td.
+					#{row.hobby_done}/#{row.hobby_total} (#{row.hobby_percent}%)
+				td.
+					#{row.all_done}/#{row.all_total} (#{row.all_percent}%)
+	p.
+		Ostatnia aktualizacja: #{last_updated}
