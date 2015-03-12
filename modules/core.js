@@ -27,7 +27,7 @@ function completeRun(dateFrom, dateTo, cb){
 		});
 	}
 	else {
-		var err = new Error('Update in progress! Pliz traj egen in e fju sekonds.');
+		var err = new Error('Update in progress! Please try again in a few seconds, yo.');
 		err.status = 503;
 		cb(err);
 	}
