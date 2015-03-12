@@ -2,7 +2,6 @@
 //  OpenShift sample Node application
 var express = require('express');
 var fs      = require('fs');
-var config  = require('./config');
 
 /**
  *  Define the sample application.
