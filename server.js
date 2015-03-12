@@ -3,6 +3,7 @@
 var express = require('express');
 var fs      = require('fs');
 
+
 /**
  *  Define the sample application.
  */
@@ -94,11 +95,6 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
-        // Routes for /health, /asciimo and /
-        self.routes['/health'] = function(req, res) {
-            res.send('1');
-        };
-
         self.routes['/asciimo'] = function(req, res) {
             var link = "http://i.imgur.com/kmbjB.png";
             res.send("<html><body><img src='" + link + "'></body></html>");
@@ -135,17 +131,7 @@ var SampleApp = function() {
         self.setupTerminationHandlers();
 
         // Create the express server and routes.
-        //self.initializeServer();
-
-	    var paracucchi = require('./paracucchi-ssoup');
-
-	    var app = new paracucchi({
-                kitchens: config.kitchens,
-                host: self.ipaddress,
-                port: self.port
-    	});
-
-    	app.init();
+        self.initializeServer();
     };
 
 
@@ -169,4 +155,5 @@ var SampleApp = function() {
  */
 var zapp = new SampleApp();
 zapp.initialize();
-// zapp.start();
+zapp.start();
+
