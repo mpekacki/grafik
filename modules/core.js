@@ -63,23 +63,20 @@ function performUpdate(dateFrom, dateTo, cb){
 }
 
 function getChart(dateFrom, dateTo, cb) {
-	var startOfDay = new Date(dateTo);
-	startOfDay.setHours(0,0,0,0);
+	var startOfDay = moment(dateTo).startOf('day');
 	var callsToDo = 0;
 	var result = [];
-	var fromTemp = new Date(dateFrom);
-	fromTemp.setHours(0,0,0,0);
+	var fromTemp = moment(dateFrom).startOf('day');
 	do{
-		var endOfDay = new Date(startOfDay);
-		endOfDay.setDate(endOfDay.getDate() + 1);
+		var endOfDay = moment(startOfDay).endOf('day');
 
-		getStoriesForDates(startOfDay, endOfDay, function(err, stories){
+		getStoriesForDates(startOfDay.toDate(), endOfDay.toDate(), function(err, stories){
 			//na wypadek, jeśli dla danego okresu nie ma żadnych opowiadań
 			//wtedy przy ostatnim dniu wywołuje cb
 			if (stories.length === 0){
-				var temp = new Date();
-				temp.setDate(startOfDay.getDate() -1);
-				if (temp < fromTemp) {cb(null, []); return;}
+				var temp = moment(startOfDay);
+				temp.subtract(1, 'days');
+				if (temp < fromTemp && callsToDo === 0) {cb(null, []); return;}
 			}
 			//
 
@@ -96,7 +93,7 @@ function getChart(dateFrom, dateTo, cb) {
 			}
 		});
 
-		startOfDay.setDate(startOfDay.getDate() - 1);
+		startOfDay.subtract(1, 'days');
 	}while(startOfDay >= fromTemp);
 }
 
