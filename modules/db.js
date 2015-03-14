@@ -1,5 +1,5 @@
 var pg = require('pg');
-var log = (process.env.ENV === 'dev');
+var log = (process.env.ENV === 'development');
 
 module.exports = {
 	init: function(dbUrl){

@@ -47,7 +47,7 @@ Story.prototype.insert = function (cb){
 }
 
 Story.prototype.update = function (judges, cb){
-	judges = JSON.parse(JSON.stringify(judges));
+	var judges = [];
 	var story = this;
 	var dbStory = new Story();
 	dbStory.createFromDatabase(this.nfid, function(err){
@@ -66,6 +66,12 @@ Story.prototype.update = function (judges, cb){
 			$('section.kom a.login').each(function(){
 				var name = $(this).html();
 				if (name in judges) ++(judges[name].commCount);
+				else {
+					judges[name] = {
+						id: 0,
+						commCount: 1
+					};
+				}
 			});
 			db.query('UPDATE "Stories" SET "last_updated" = now(), "last_commenter" = $1, "last_comment_count" = $2 WHERE "nf_id" = $3;',
 				[story.lastCommenter, story.lastCommentCount, story.nfid],
@@ -74,14 +80,19 @@ Story.prototype.update = function (judges, cb){
 					var query = 'WITH upsert AS (UPDATE "StoriesJudgesComments" SET "comment_count" = $3 WHERE "StoryId" = $1 AND "JudgeId" = $2 RETURNING *) INSERT INTO "StoriesJudgesComments" ("StoryId", "JudgeId", "comment_count") SELECT $1, $2, $3 WHERE NOT EXISTS (SELECT * FROM upsert);';
 					var insertsToDo = Object.keys(judges).length;
 					for (var name in judges){
-						db.query(query,
-							[story.nfid, judges[name].id, judges[name].commCount],
-							function(err,result){
-								--insertsToDo;
-								if (err) {cb(err); console.error(err); return; }
-								if(insertsToDo === 0) cb(null, story.nfid);
-							}
-						);
+						var getJudgeIdQuery = 'WITH s AS (SELECT "id" FROM "Judges" WHERE "name" = $1), i AS (INSERT INTO "Judges" ("name", "active") SELECT $1, false WHERE NOT EXISTS (SELECT 1 FROM s) RETURNING "id") SELECT "id" FROM i UNION ALL SELECT "id" FROM s;';
+						db.query(getJudgeIdQuery, [name], function(err,result){
+							if (err) {cb(err); console.error(err); return;}
+							judges[name].id = result.rows[0].id;
+							db.query(query,
+								[story.nfid, judges[name].id, judges[name].commCount],
+								function(err,result){
+									--insertsToDo;
+									if (err) {cb(err); console.error(err); return; }
+									if(insertsToDo === 0) cb(null, story.nfid);
+								}
+							);
+						});
 					}
 				}
 			);
