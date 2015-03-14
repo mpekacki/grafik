@@ -71,15 +71,6 @@ function getChart(dateFrom, dateTo, cb) {
 		var endOfDay = moment(startOfDay).endOf('day');
 
 		getStoriesForDates(startOfDay.toDate(), endOfDay.toDate(), function(err, stories){
-			//na wypadek, jeśli dla danego okresu nie ma żadnych opowiadań
-			//wtedy przy ostatnim dniu wywołuje cb
-			if (stories.length === 0){
-				var temp = moment(startOfDay);
-				temp.subtract(1, 'days');
-				if (temp < fromTemp && callsToDo === 0) {cb(null, []); return;}
-			}
-			//
-
 			var locResult = [];
 			var locCallsToDo = stories.length;
 			callsToDo += locCallsToDo;
@@ -116,7 +107,7 @@ function resSort(a,b){
 
 function getStoriesForDates(dateFrom, dateTo, cb){
 	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count" FROM "Stories" WHERE "date" >= $1 AND "date" < $2;',
-		[dateFrom.toISOString(), dateTo.toISOString()],
+		[moment(dateFrom).format(), moment(dateTo).format()],
 		function(err,result){
 			if(err) {console.error(err); cb(err); return;}
 			cb(null, result.rows);
