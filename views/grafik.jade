@@ -3,7 +3,7 @@ extends layout
 block content
 	a(href='#podsumowanie',name='top',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-down')
-		| do podsumowania
+		| &nbsp;do podsumowania
 	ul(class='nav nav-tabs',role='tablist')
 		li(role='presentation',class='active')
 			a(href='#lozownicy',aria-controls='lozownicy',role='tab',data-toggle='tab')
@@ -57,13 +57,13 @@ block content
 	div(class='row')
 		div(class='col-sm-6 small')
 			if history < max_hist
-				a(href='/' + (history + 1) + '#podsumowanie').
+				a(href='/' + (history + 1) + '#podsumowanie',class='btn').
 					<< poprzedni miesiąc
 			else
 				| &nbsp;
 		div(class='col-sm-6 small text-right')
 			if history > 0 
-				a(href='/' + (history != 1 ? (history - 1) : '') + '#podsumowanie').
+				a(href='/' + (history != 1 ? (history - 1) : '') + '#podsumowanie',class='btn').
 					następny miesiąc >>
 	table(class='table')
 		tr
