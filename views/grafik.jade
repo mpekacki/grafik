@@ -12,7 +12,7 @@ block content
 			a(href='#uzytkownicy',aria-controls='uzytkownicy',role='tab',data-toggle='tab')
 				| Użytkownicy
 	div(class='tab-content')
-		div(role='tabpanel',class='tab-pane fade in active',id='lozownicy',aria-labelledby='lozownnicy-tab')
+		div(role='tabpanel',class='tab-pane fade in active',id='lozownicy',aria-labelledby='lozownicy-tab')
 			table(class='table table-bordered table-hover table-condensed')
 				each day, i in days
 					tr(class='active')
@@ -65,6 +65,7 @@ block content
 			if history > 0 
 				a(href='/' + (history != 1 ? (history - 1) : '') + '#podsumowanie',class='btn').
 					następny miesiąc >>
+	-var nonPermHit = false
 	table(class='table')
 		tr
 			th
@@ -74,7 +75,17 @@ block content
 				Hobby
 			th.
 				Razem
+		tr
+			td(colspan=4)
+				i
+					| Lożownicy
 		each row, r in summary.rows
+			if !row.permanent && !nonPermHit
+				-nonPermHit = true
+				tr
+					td(colspan=4)
+						i
+							| Użytkownicy
 			tr
 				td
 					strong=row.name
