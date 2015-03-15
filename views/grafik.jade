@@ -4,22 +4,52 @@ block content
 	a(href='#podsumowanie',name='top')
 		span(class='glyphicon glyphicon-chevron-down')
 		| do podsumowania
-	table(class='table table-bordered table-hover table-condensed')
-		each day, i in days
-			tr(class='active')
-				th
-					h3=day.display_day
-				each judge, x in day.stories[0].comments
-					th(class='text-center' + (judge.on_duty ? ' warning' : ''))=judge.name
-			each story, j in day.stories
-				tr
-					td
-						| #{story.author} - 
-						a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
-						| - #{story.display_date} - #{story.last_comment_count} kom.
-					each entry, k in story.comments
-						td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '') + ' text-center')
-							| #{entry.comment_count}
+	ul(class='nav nav-tabs',role='tablist')
+		li(role='presentation',class='active')
+			a(href='#lozownicy',aria-controls='lozownicy',role='tab',data-toggle='tab')
+				| Lożownicy
+		li(role='presentation')
+			a(href='#uzytkownicy',aria-controls='uzytkownicy',role='tab',data-toggle='tab')
+				| Użytkownicy
+	div(class='tab-content')
+		div(role='tabpanel',class='tab-pane fade in active',id='lozownicy',aria-labelledby='lozownnicy-tab')
+			table(class='table table-bordered table-hover table-condensed')
+				each day, i in days
+					tr(class='active')
+						th
+							h3=day.display_day
+						each judge, x in day.stories[0].comments
+							if judge.permanent
+								th(class='text-center' + (judge.on_duty ? ' warning' : ''))=judge.name
+					each story, j in day.stories
+						tr
+							td
+								| #{story.author} - 
+								a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
+								| - #{story.display_date} - #{story.last_comment_count} kom.
+							each entry, k in story.comments
+								if entry.permanent
+									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '') + ' text-center')
+										| #{entry.comment_count}
+		div(role='tabpanel',class='tab-pane fade',id='uzytkownicy',aria-labelledby='uzytkownicy-tab')
+			table(class='table table-bordered table-hover table-condensed')
+				each day, i in days
+					tr(class='active')
+						th
+							h3=day.display_day
+						each judge, x in day.stories[0].comments
+							if !judge.permanent
+								th(class='text-center' + (judge.on_duty ? ' warning' : ''))=judge.name
+					each story, j in day.stories
+						tr
+							td
+								| #{story.author} - 
+								a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
+								| - #{story.display_date} - #{story.last_comment_count} kom.
+							each entry, k in story.comments
+								if !entry.permanent
+									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '') + ' text-center')
+										| #{entry.comment_count}
 	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-up')
 	h4

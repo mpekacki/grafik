@@ -115,7 +115,7 @@ function getStoriesForDates(dateFrom, dateTo, cb){
 };
 
 function getTableRowsForStory(story, cb){
-	db.query('WITH comments AS (SELECT "Judges"."id", "comment_count" FROM "Stories" INNER JOIN "StoriesJudgesComments" ON "Stories"."nf_id" = "StoriesJudgesComments"."StoryId" INNER JOIN "Judges" ON "StoriesJudgesComments"."JudgeId" = "Judges"."id" WHERE "nf_id" = $1 AND "active" = true) SELECT "Judges"."name", COALESCE(comments."comment_count", 0) AS "comment_count", sum(CASE WHEN EXTRACT(DOW FROM "Stories"."date") = "day_of_week" THEN 1 ELSE 0 END) > 0 AS "on_duty" FROM "Stories", "Judges" LEFT JOIN comments ON "Judges"."id" = comments."id" LEFT JOIN "Duties" ON "Judges"."id" = "Duties"."JudgeId" WHERE "Stories"."nf_id" = $1 AND "active" = true GROUP BY "name", "comment_count" ORDER BY "name";',
+	db.query('WITH comments AS (SELECT "Judges"."id", "comment_count" FROM "Stories" INNER JOIN "StoriesJudgesComments" ON "Stories"."nf_id" = "StoriesJudgesComments"."StoryId" INNER JOIN "Judges" ON "StoriesJudgesComments"."JudgeId" = "Judges"."id" WHERE "nf_id" = $1 AND "active" = true) SELECT "Judges"."name", COALESCE(comments."comment_count", 0) AS "comment_count", sum(CASE WHEN EXTRACT(DOW FROM "Stories"."date") = "day_of_week" THEN 1 ELSE 0 END) > 0 AS "on_duty", "permanent" FROM "Stories", "Judges" LEFT JOIN comments ON "Judges"."id" = comments."id" LEFT JOIN "Duties" ON "Judges"."id" = "Duties"."JudgeId" WHERE "Stories"."nf_id" = $1 AND "active" = true GROUP BY "name", "comment_count", "permanent" ORDER BY "permanent" DESC, "name" ASC;',
 		[story.nf_id],
 		function(err,result){
 			if(err) {console.error(err); cb(err); return;}
