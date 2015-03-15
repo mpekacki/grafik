@@ -226,9 +226,10 @@ function updateStoriesIndex(nfids, judges, topDate, bottomDate, dateFrom, cb, pa
 				story.insert(function(err, retStory){
 					if(err) { cb(err); nfids = []; console.error(err); return false; }
 					anyCallback = true;
-					callbacks.push(story.nfid);
+					callbacks.push(retStory.nfid);
 					retStory.update(judges, function(err, retNfid){
 						callbacks.splice(callbacks.indexOf(retNfid), 1);
+						if (callbacks.length) console.log(callbacks[0]);
 						if(err) { cb(err); nfids = []; console.error(err); return false; }
 						if(callbacks.length === 0 && finished) {cb(null);}
 					});

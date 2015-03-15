@@ -47,7 +47,7 @@ Story.prototype.insert = function (cb){
 }
 
 Story.prototype.update = function (judges, cb){
-	var judges = [];
+	var judges = {};
 	var story = this;
 	var dbStory = new Story();
 	dbStory.createFromDatabase(this.nfid, function(err){
@@ -63,7 +63,9 @@ Story.prototype.update = function (judges, cb){
 
 		reqs.makeHttpGet(url, function(err, $){
 			if (err){ cb(err); return; }
-			$('section.kom a.login').each(function(){
+			var comments = $('section.kom a.login');
+			if (comments.length === 0) cb(null, story.nfid);
+			comments.each(function(){
 				var name = $(this).html();
 				if (name in judges) ++(judges[name].commCount);
 				else {

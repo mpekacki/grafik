@@ -13,8 +13,8 @@ module.exports = {
 		}
 		pg.connect(this.dbUrl, function(err, client, done){
 			if (err) return cb(err);
-			if(log)
-				console.log(text + values);
+			// if(log)
+			// 	console.log(text + values);
 			client.query(text, values, function(err, result){
 				done();
 				cb(err, result);
