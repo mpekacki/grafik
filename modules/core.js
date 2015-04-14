@@ -11,13 +11,10 @@ function completeRun(dateFrom, dateTo, cb){
 		process.env.UPDATE = 'true';
 		performUpdate(dateFrom, dateTo, function(err){
 			process.env.UPDATE = null;
-			if(err) {cb(err); console.error(err); return}
-			getEverything(dateFrom, dateTo, cb);
+			if(err) { console.error(err); }
 		});
 	}
-	else {
-		getEverything(dateFrom, dateTo, cb);
-	}
+	getEverything(dateFrom, dateTo, cb);
 }
 
 function getEverything(dateFrom, dateTo, cb){
