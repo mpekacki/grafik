@@ -12,31 +12,33 @@ function completeRun(dateFrom, dateTo, cb){
 		performUpdate(dateFrom, dateTo, function(err){
 			process.env.UPDATE = null;
 			if(err) {cb(err); console.error(err); return}
-			getChart(dateFrom,dateTo, function(err, result){
-				if(err) {cb(err); console.error(err); return}
-				var rows = result;
-				getSummary(dateFrom, dateTo, function(err,result){
-					if(err) {cb(err); console.error(err); return}
-					var summary = result;
-					getLastUpdateDate(dateFrom, dateTo, function(err, date){
-						if(err) {cb(err); console.error(err); return}
-						cb(null, {days: rows, summary:summary, last_updated: date});
-					});
-				});
-			});
+			getEverything(dateFrom, dateTo, cb);
 		});
 	}
 	else {
-		var err = new Error('Update in progress! Please try again in a few seconds, yo.');
-		err.status = 503;
-		cb(err);
+		getEverything(dateFrom, dateTo, cb);
 	}
+}
+
+function getEverything(dateFrom, dateTo, cb){
+	getChart(dateFrom,dateTo, function(err, result){
+		if(err) {cb(err); console.error(err); return}
+		var rows = result;
+		getSummary(dateFrom, dateTo, function(err,result){
+			if(err) {cb(err); console.error(err); return}
+			var summary = result;
+			getLastUpdateDate(dateFrom, dateTo, function(err, date){
+				if(err) {cb(err); console.error(err); return}
+				cb(null, {days: rows, summary:summary, last_updated: date});
+			});
+		});
+	});
 }
 
 function performUpdate(dateFrom, dateTo, cb){
 	createJudgesObj(function(err, judges){
 		if (err) {cb(err);console.error(err);return;}
-		getTopBottomDates(function(err, dates){
+		getTopBottomDates(dateFrom, dateTo, function(err, dates){
 			var storiesEmpty = false;
 			var bottomDate = dates.bottom_date;
 			var topDate = dates.top_date;
@@ -69,7 +71,6 @@ function getChart(dateFrom, dateTo, cb) {
 	var fromTemp = moment(dateFrom).startOf('day');
 	do{
 		var endOfDay = moment(startOfDay).endOf('day');
-
 		getStoriesForDates(startOfDay.toDate(), endOfDay.toDate(), function(err, stories){
 			var locResult = [];
 			var locCallsToDo = stories.length;
@@ -139,8 +140,8 @@ function getStoriesThatNeedUpdate(dateFrom, dateTo, cb) {
 	);
 }
 
-function getTopBottomDates(cb){
-	db.query('SELECT max("date") AS "top_date", min("date") AS "bottom_date" FROM "Stories";', [], function(err, result){
+function getTopBottomDates(dateFrom, dateTo, cb){
+	db.query('SELECT max("date") AS "top_date", min("date") AS "bottom_date" FROM "Stories" WHERE "date" BETWEEN $1 AND $2;', [dateFrom.toISOString(), dateTo.toISOString()], function(err, result){
 		if(err) { cb(err); console.error(err); return; }
 		cb(null, result.rows[0]);
 	});

@@ -6,6 +6,7 @@ var core = require('../modules/core');
 var db = require('../modules/db');
 var Story = require('../modules/Story');
 var moment = require('moment');
+var log = (process.env.ENV === 'development');
 moment.locale('pl');
 
 /* GET home page. */
@@ -21,7 +22,7 @@ router.get('/:history?', function(req, res, next) {
   endDate = moment(endDate).subtract(hist, 'months').toDate();
   if (hist > 0) endDate = moment(endDate).endOf('month').toDate();
   var startDate = moment(endDate).startOf('month').toDate();
-  console.log(startDate, endDate);
+  if (log) console.log(startDate, endDate);
   core.completeRun(startDate, endDate, function(err,result){
     if(err) return next(err);
   	res.render('grafik', {title: 'Grafik loży NF', days: result.days, summary: result.summary, date_from: moment(startDate).format('D MMMM YYYY'), date_to: moment(endDate).format('D MMMM YYYY'), last_updated: moment(result.last_updated).format('LLL'), history: hist, max_hist: process.env.MONTHS});
