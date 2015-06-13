@@ -22,6 +22,10 @@ block content
 				Użytkownik
 			th.
 				Liczba komentarzy
+			th.
+				W tym pod własnymi tekstami
+			th.
+				Liczba skomentowanych tekstów
 		each row, r in stats
 			tr
 				td.
@@ -29,7 +33,7 @@ block content
 				td
 					if row.active
 						if row.permanent
-							b.
+							strong.
 								#{row.name}
 						else
 							i.
@@ -37,4 +41,8 @@ block content
 					else
 						| #{row.name}
 				td.
-					#{row.count}
+					#{row.comment_count}
+				td.
+					#{row.own_count}
+				td.
+					#{row.stories_count}
