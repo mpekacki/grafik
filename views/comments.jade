@@ -1,0 +1,40 @@
+extends layout
+
+block content
+	h2.
+		Statystyka komentarzy za #{month}
+	div(class='row')
+		div(class='col-sm-6 small')
+			if history < max_hist
+				a(href='/komentarze/' + (history + 1),class='btn').
+					<< poprzedni miesiąc
+			else
+				| &nbsp;
+		div(class='col-sm-6 small text-right')
+			if history > 0 
+				a(href='/komentarze/' + (history != 1 ? (history - 1) : ''),class='btn').
+					następny miesiąc >>
+	table(class='table')
+		tr
+			th(class='col-md-1').
+				#
+			th.
+				Użytkownik
+			th.
+				Liczba komentarzy
+		each row, r in stats
+			tr
+				td.
+					#{r + 1}.
+				td
+					if row.active
+						if row.permanent
+							b.
+								#{row.name}
+						else
+							i.
+								#{row.name}
+					else
+						| #{row.name}
+				td.
+					#{row.count}

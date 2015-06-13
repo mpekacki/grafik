@@ -242,6 +242,16 @@ function updateStoriesIndex(nfids, judges, topDate, bottomDate, dateFrom, cb, pa
 	});
 }
 
+function getCommentStats(dateFrom, dateTo, cb){
+	db.query('SELECT "name", SUM("comment_count") AS "count", "active", "permanent" FROM "StoriesJudgesComments" INNER JOIN "Judges" ON "JudgeId"="id" INNER JOIN "Stories" ON "StoryId"="nf_id" WHERE "date" BETWEEN $1 AND $2 GROUP BY "name", "active", "permanent" ORDER BY "count" DESC LIMIT 25;',
+		[dateFrom, dateTo],
+		function(err, result){
+			if (err) { cb(err); console.error(err); return; }
+			cb(null, result.rows);
+		});
+}
+
 module.exports = {
-	completeRun: completeRun
+	completeRun: completeRun,
+	getCommentStats: getCommentStats
 };
