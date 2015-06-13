@@ -23,7 +23,7 @@ block content
 			th.
 				Liczba komentarzy
 			th.
-				W tym pod własnymi tekstami
+				W tym pod cudzymi tekstami
 			th.
 				Liczba skomentowanych tekstów
 		each row, r in stats
@@ -43,6 +43,6 @@ block content
 				td.
 					#{row.comment_count}
 				td.
-					#{row.own_count}
+					#{row.others_count}
 				td.
 					#{row.stories_count}
