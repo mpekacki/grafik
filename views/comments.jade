@@ -14,35 +14,33 @@ block content
 			if history > 0 
 				a(href='/komentarze/' + (history != 1 ? (history - 1) : ''),class='btn').
 					następny miesiąc >>
-	table(class='table')
-		tr
-			th(class='col-md-1').
-				#
-			th.
-				Użytkownik
-			th.
-				Liczba komentarzy
-			th.
-				W tym pod cudzymi tekstami
-			th.
-				Liczba skomentowanych tekstów
-		each row, r in stats
+	table(class='table tablesorter')
+		thead
 			tr
-				td.
-					#{r + 1}.
-				td
-					if row.active
-						if row.permanent
-							strong.
-								#{row.name}
+				th.
+					Użytkownik
+				th.
+					Liczba komentarzy
+				th.
+					W tym pod cudzymi tekstami
+				th.
+					Liczba skomentowanych tekstów
+		tbody
+			each row, r in stats
+				tr
+					td
+						if row.active
+							if row.permanent
+								strong.
+									#{row.name}
+							else
+								i.
+									#{row.name}
 						else
-							i.
-								#{row.name}
-					else
-						| #{row.name}
-				td.
-					#{row.comment_count}
-				td.
-					#{row.others_count}
-				td.
-					#{row.stories_count}
+							| #{row.name}
+					td.
+						#{row.comment_count}
+					td.
+						#{row.others_count}
+					td.
+						#{row.stories_count}
