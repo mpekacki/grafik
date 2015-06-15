@@ -9,12 +9,23 @@ function completeRun(dateFrom, dateTo, cb){
 	if(diffDays >= 100){cb("date range too big"); return; }
 	if (process.env.UPDATE !== 'true'){
 		process.env.UPDATE = 'true';
-		performUpdate(dateFrom, dateTo, function(err){
-			process.env.UPDATE = null;
-			if(err) { console.error(err); }
-		});
+		removeOutdatedStuff(function(err){
+			performUpdate(dateFrom, dateTo, function(err){
+				process.env.UPDATE = null;
+				if(err) { console.error(err); }
+			});
+	});
+
 	}
 	getEverything(dateFrom, dateTo, cb);
+}
+
+function removeOutdatedStuff(cb){
+	var borderDate = moment(new Date()).subtract(process.env.MONTHS, 'months').startOf('month').toDate();
+	db.query('DELETE FROM "Stories" WHERE "date" < $1;', [borderDate], function(err, result){
+		if(err){cb(err); console.error(err); return;}
+		cb(null);
+	});
 }
 
 function getEverything(dateFrom, dateTo, cb){
