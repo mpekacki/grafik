@@ -9,12 +9,17 @@ block content
 		| function drawChart() {
 
 		| var data = new google.visualization.DataTable();
+		| var data2 = new google.visualization.DataTable();
 		| data.addColumn('string', 'Miesiąc');
+		| data2.addColumn('string', 'Miesiąc');
 		|  
 		each row, i in fullSummary[0].rows
 			if row.permanent
 				| data.addColumn('number', '#{ row.name }');
 				|  
+			else
+				| data2.addColumn('number', '#{ row.name }');
+				| 
 
 		| data.addRows([
 		each month, i in fullSummary
@@ -25,16 +30,32 @@ block content
 			| ],
 		| ]);
 
+		| data2.addRows([
+		each month, i in fullSummary
+			| ['#{ month.name }'
+			each row, j in month.rows
+				if !row.permanent
+					| ,#{ row.quota_percent }
+			| ],
+		| ]);
+
 		| var options = {
 		| title: 'Realizacja normy przez Lożę (w procentach)',
-		| subtitle: 'w procentach',
 		| width: 900,
 		| height: 500
 		| };
 
-		| var chart = new google.visualization.LineChart(document.getElementById('linechart_material'));
+		| var options2 = {
+		| title: 'Realizacja normy przez Użytkowników (w procentach)',
+		| width: 900,
+		| height: 500
+		| };
+
+		| var chart = new google.visualization.LineChart(document.getElementById('wykres_loza'));
+		| var chart2 = new google.visualization.LineChart(document.getElementById('wykres_uzytkownicy'));
 
 		| chart.draw(data, options);
+		| chart2.draw(data2, options2);
 		| }
 	a(href='#podsumowanie',name='top',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-down')
@@ -130,6 +151,7 @@ block content
 					#{row.hobby_done}/#{row.hobby_total} (#{row.hobby_percent}%)
 				td.
 					#{row.all_done}/#{row.all_total} (#{row.all_percent}%)
-	div(id='linechart_material')
+	div(id='wykres_loza')
+	div(id='wykres_uzytkownicy')
 	p.
 		Ostatnia aktualizacja: #{last_updated}
