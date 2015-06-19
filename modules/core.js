@@ -37,7 +37,9 @@ function getEverything(dateFrom, dateTo, cb){
 			var summary = result;
 			getLastUpdateDate(dateFrom, dateTo, function(err, date){
 				if(err) {cb(err); console.error(err); return}
-				cb(null, {days: rows, summary:summary, last_updated: date});
+				getSummaryForAllMonths(process.env.MONTHS, [], function(err, fullSummary){
+					cb(null, {days: rows, summary:summary, fullSummary: fullSummary, last_updated: date});
+				});
 			});
 		});
 	});
@@ -104,6 +106,21 @@ function getSummary(dateFrom, dateTo, cb){
 			if(err){cb(err); console.error(err); return}
 			cb(null,result);
 		});
+}
+
+function getSummaryForAllMonths(month, results, cb){
+	var dateFrom = moment(new Date()).subtract(month, 'months').startOf('month').toDate();
+	var dateTo = moment(dateFrom).endOf('month').toDate();
+	getSummary(dateFrom, dateTo, function(err, result){
+		result.name = moment(dateTo).format('MMMM');
+		results.push(result);
+		if (month === 0){
+			cb(null, results);
+		}
+		else{
+			getSummaryForAllMonths(month - 1, results, cb);
+		}
+	});
 }
 
 function locResSort(a,b){

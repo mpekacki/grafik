@@ -43,7 +43,7 @@ router.get('/:history?', function(req, res, next) {
   if (log) console.log(startDate, endDate);
   core.completeRun(startDate, endDate, function(err,result){
     if(err) return next(err);
-  	res.render('grafik', {title: 'Grafik loży NF', days: result.days, summary: result.summary, date_from: moment(startDate).format('D MMMM YYYY'), date_to: moment(endDate).format('D MMMM YYYY'), last_updated: moment(result.last_updated).format('LLL'), history: hist, max_hist: process.env.MONTHS});
+  	res.render('grafik', {title: 'Grafik loży NF', days: result.days, summary: result.summary, fullSummary: result.fullSummary, date_from: moment(startDate).format('D MMMM YYYY'), date_to: moment(endDate).format('D MMMM YYYY'), last_updated: moment(result.last_updated).format('LLL'), history: hist, max_hist: process.env.MONTHS});
   });
 });
 
