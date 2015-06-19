@@ -12,14 +12,16 @@ block content
 		| data.addColumn('string', 'Miesiąc');
 		|  
 		each row, i in fullSummary[0].rows
-			| data.addColumn('number', '#{ row.name }');
-			|  
+			if row.permanent
+				| data.addColumn('number', '#{ row.name }');
+				|  
 
 		| data.addRows([
 		each month, i in fullSummary
 			| ['#{ month.name }'
 			each row, j in month.rows
-				| ,#{ row.quota_percent }
+				if row.permanent
+					| ,#{ row.quota_percent }
 			| ],
 		| ]);
 
