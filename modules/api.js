@@ -85,7 +85,7 @@ module.exports = {
 						});
 					}
 					else{
-						db.query('DELETE FROM "Duties" USING "Judges" WHER "Duties"."JudgeId" = "Judges"."id" AND "day_of_week" = $1 AND "Judges"."name" = $2;',
+						db.query('DELETE FROM "Duties" USING "Judges" WHERE "Duties"."JudgeId" = "Judges"."id" AND "day_of_week" = $1 AND "Judges"."name" = $2;',
 							[day, username],
 								function(err,result){
 								++callbacksNo;
