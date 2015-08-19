@@ -279,7 +279,15 @@ function getCommentStats(dateFrom, dateTo, cb){
 		});
 }
 
+function getJudges(cb){
+	db.query('SELECT "name", "active", "permanent" FROM "Judges" ORDER BY "name" ASC;', [], function(err, result){
+		if(err){cb(err); console.error(err); return}
+		cb(null, result.rows);
+	});
+}
+
 module.exports = {
 	completeRun: completeRun,
-	getCommentStats: getCommentStats
+	getCommentStats: getCommentStats,
+	getJudges: getJudges
 };
