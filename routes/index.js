@@ -30,12 +30,20 @@ router.get('/komentarze/:history?', function(req, res, next){
 
 /* panel admina, modyfikacja dyżurów */
 router.get('/lubieplacki/:username?', function(req, res, next) {
+  if (req.headers['x-forwarded-proto'] == 'http') { 
+      res.redirect('https://' + req.headers.host + req.path);
+  } 
+
   core.getJudges(function(err,result){
     res.render('admin', {osoby: result, selectedUser: req.params.username});
   });
 });
 
 router.post('/api/dyzury', function(req, res, next){
+  if (req.headers['x-forwarded-proto'] == 'http') { 
+      res.redirect('https://' + req.headers.host + req.path);
+  }
+
   if(req.body.klucz !== process.env.KLUCZ){
     var err = new Error("BZZT! Wrong authorization key! Dispatching security forces. Have a nice day.");
     err.status = 401;
