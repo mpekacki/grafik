@@ -26,15 +26,12 @@ module.exports = {
 			}
 
 			var duties = { 
-				rola: role,
-				poniedzialek: false,
-				wtorek: false,
-				sroda: false,
-				czwarte: false,
-				piatek: false,
-				sobota: false,
-				niedziela: false
+				rola: role
 			};
+
+			for (var day = 0; day < days.length; ++day){
+				duties[days[day]] = false;
+			}
 
 			db.query('SELECT "day_of_week" FROM "Duties" INNER JOIN "Judges" ON "Duties"."JudgeId" = "Judges"."id" WHERE "Judges"."name" = $1;', 
 				[username],
