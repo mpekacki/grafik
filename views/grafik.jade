@@ -57,6 +57,9 @@ block content
 		| chart.draw(data, options);
 		| chart2.draw(data2, options2);
 		| }
+	if secret
+		p(class='text-muted')
+			| #{secret}
 	a(href='#podsumowanie',name='top',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-down')
 		| &nbsp;do podsumowania
