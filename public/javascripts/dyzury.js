@@ -17,5 +17,7 @@ function ajaxDyzuryOsoby(login){
 		$('input#piatek').prop('checked', data.piatek);
 		$('input#sobota').prop('checked', data.sobota);
 		$('input#niedziela').prop('checked', data.niedziela);
+
+		$('input#dataod').val(data.dataod);
 	});
 }

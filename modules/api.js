@@ -26,14 +26,15 @@ module.exports = {
 			}
 
 			var duties = { 
-				rola: role
+				rola: role,
+				dataod: ''
 			};
 
 			for (var day = 0; day < days.length; ++day){
 				duties[days[day]] = false;
 			}
 
-			db.query('SELECT "day_of_week" FROM "Duties" INNER JOIN "Judges" ON "Duties"."JudgeId" = "Judges"."id" WHERE "Judges"."name" = $1;', 
+			db.query('SELECT "day_of_week", MIN("from") AS "from" FROM "Duties" INNER JOIN "Judges" ON "Duties"."JudgeId" = "Judges"."id" WHERE "Judges"."name" = $1 GROUP BY "day_of_week";', 
 				[username],
 				function(err, dutiesRows){
 					if (dutiesRows === undefined){
@@ -43,6 +44,10 @@ module.exports = {
 
 					for (var iRow = 0; iRow < dutiesRows.rows.length; ++iRow){
 						duties[days[dutiesRows.rows[iRow].day_of_week]] = true;
+					}
+
+					if (dutiesRows.rows.length > 0){
+						duties.dataod = dutiesRows.rows[0].from.toISOString().substring(0, 10);
 					}
 
 					cb(null, duties);
@@ -72,8 +77,8 @@ module.exports = {
 			function(err, result){
 				for (var day = 0; day < days.length; ++day){
 					if (reqBody[days[day]] !== undefined){
-						db.query('INSERT INTO "Duties" ("day_of_week", "JudgeId") SELECT $1, "id" FROM "Judges" WHERE "name" = $2',
-						[day, username],
+						db.query('WITH upsert AS (UPDATE "Duties" SET "from" = $3 FROM "Judges" WHERE "Judges"."id" = "Duties"."JudgeId" AND "day_of_week" = $1 AND "Judges"."name" = $2 RETURNING *) INSERT INTO "Duties" ("day_of_week", "JudgeId", "from") SELECT $1, "id", now() FROM "Judges" WHERE "name" = $2 AND NOT EXISTS (SELECT * FROM upsert);',
+						[day, username, reqBody.dataod],
 						function(err,result){
 							++callbacksNo;
 							if (callbacksNo === days.length){
