@@ -59,6 +59,7 @@ module.exports = {
 
 		var active = 0;
 		var permanent = 0;
+		var dataod = reqBody.dataod || '2015-01-01';
 		if (reqBody.rola === "brak"){
 			active = 0;
 			permanent = 0;
@@ -77,8 +78,8 @@ module.exports = {
 			function(err, result){
 				for (var day = 0; day < days.length; ++day){
 					if (reqBody[days[day]] !== undefined){
-						db.query('WITH upsert AS (UPDATE "Duties" SET "from" = $3 FROM "Judges" WHERE "Judges"."id" = "Duties"."JudgeId" AND "day_of_week" = $1 AND "Judges"."name" = $2 RETURNING *) INSERT INTO "Duties" ("day_of_week", "JudgeId", "from") SELECT $1, "id", now() FROM "Judges" WHERE "name" = $2 AND NOT EXISTS (SELECT * FROM upsert);',
-						[day, username, reqBody.dataod],
+						db.query('WITH upsert AS (UPDATE "Duties" SET "from" = $3 FROM "Judges" WHERE "Judges"."id" = "Duties"."JudgeId" AND "day_of_week" = $1 AND "Judges"."name" = $2 RETURNING *) INSERT INTO "Duties" ("day_of_week", "JudgeId", "from") SELECT $1, "id", $3 FROM "Judges" WHERE "name" = $2 AND NOT EXISTS (SELECT * FROM upsert);',
+						[day, username, dataod],
 						function(err,result){
 							++callbacksNo;
 							if (callbacksNo === days.length){
