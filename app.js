@@ -10,6 +10,7 @@ var routes = require('./routes/index');
 var db = require('./modules/db');
 db.init(process.env.OPENSHIFT_POSTGRESQL_DB_URL);
 var core = require('./modules/core');
+var stats = require('./modules/stats');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(stats);
 
 app.use('/', routes);
 
