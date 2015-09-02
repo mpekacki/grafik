@@ -9,7 +9,7 @@ var stats = function(req, res, next) {
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
   
-  db.query('INSERT INTO "Stats" ("ip", "page", "protocol", "date") VALUES ($1, $2, $3, $4);', [ip, req.url, req.protocol, new Date()], function(err, result) { });
+  db.query('INSERT INTO "Stats" ("ip", "page", "protocol", "date") VALUES ($1, $2, $3, $4);', [ip, req.url, req.headers['x-forwarded-proto'], new Date()], function(err, result) { });
   next();
 };
 
