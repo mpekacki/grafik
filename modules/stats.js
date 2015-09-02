@@ -1,12 +1,15 @@
 var db = require('./db');
 
 var stats = function(req, res, next) {
+	if (req.url === "/favicon.ico"){
+		return next();
+	}
 	var ip = req.headers['x-forwarded-for'] || 
      req.connection.remoteAddress || 
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
   
-  db.query('INSERT INTO "Stats" ("ip", "date") VALUES ($1, $2);', [ip, new Date()], function(err, result) { });
+  db.query('INSERT INTO "Stats" ("ip", "page", "protocol", "date") VALUES ($1, $2, $3, $4);', [ip, req.url, req.protocol, new Date()], function(err, result) { });
   next();
 };
 
