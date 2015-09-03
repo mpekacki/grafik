@@ -10,7 +10,12 @@ var moment = require('moment');
 var log = (process.env.ENV === 'development');
 moment.locale('pl');
 
-router.get('/komentarze/:history?', function(req, res, next){
+router.get('/robots.txt', function (req, res) {
+    res.type('text/plain');
+    res.send("User-agent: *\nDisallow: /");
+});
+
+router.get('/komentarze/:history?', function (req, res, next){
   var hist = req.params.history ? +req.params.history : 0;
   if (hist < 0) hist = -hist;
   if (hist > process.env.MONTHS) {
@@ -29,7 +34,7 @@ router.get('/komentarze/:history?', function(req, res, next){
 });
 
 /* panel admina, modyfikacja dyżurów */
-router.get('/lubieplacki/:username?', function(req, res, next) {
+router.get('/lubieplacki/:username?', function (req, res, next) {
   if (req.headers['x-forwarded-proto'] == 'http') { 
       res.redirect('https://' + req.headers.host + req.path);
   } 
@@ -39,7 +44,7 @@ router.get('/lubieplacki/:username?', function(req, res, next) {
   });
 });
 
-router.post('/api/dyzury', function(req, res, next){
+router.post('/api/dyzury', function (req, res, next){
   if (req.headers['x-forwarded-proto'] == 'http') { 
       res.redirect('https://' + req.headers.host + req.path);
   }
