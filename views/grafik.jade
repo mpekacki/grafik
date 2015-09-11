@@ -79,7 +79,7 @@ block content
 							h3=day.display_day
 						each judge, x in day.stories[0].comments
 							if judge.permanent
-								th(judge.on_duty ? ' warning' : '')=judge.name
+								th(class=judge.on_duty ? ' warning' : '')=judge.name
 					each story, j in day.stories
 						tr
 							td
