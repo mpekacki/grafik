@@ -72,14 +72,14 @@ block content
 				| Użytkownicy
 	div(class='tab-content')
 		div(role='tabpanel',class='tab-pane fade in active',id='lozownicy',aria-labelledby='lozownicy-tab')
-			table(class='table table-bordered table-hover table-condensed')
+			table(class='grafik table table-bordered table-hover table-condensed')
 				each day, i in days
 					tr(class='active')
 						th
 							h3=day.display_day
 						each judge, x in day.stories[0].comments
 							if judge.permanent
-								th(class='text-center' + (judge.on_duty ? ' warning' : ''))=judge.name
+								th(judge.on_duty ? ' warning' : '')=judge.name
 					each story, j in day.stories
 						tr
 							td
@@ -88,17 +88,17 @@ block content
 								| - #{story.display_date} - #{story.last_comment_count} kom.
 							each entry, k in story.comments
 								if entry.permanent
-									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '') + ' text-center')
+									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : ''))
 										| #{entry.comment_count}
 		div(role='tabpanel',class='tab-pane fade',id='uzytkownicy',aria-labelledby='uzytkownicy-tab')
-			table(class='table table-bordered table-hover table-condensed')
+			table(class='grafik table table-bordered table-hover table-condensed')
 				each day, i in days
 					tr(class='active')
 						th
 							h3=day.display_day
 						each judge, x in day.stories[0].comments
 							if !judge.permanent
-								th(class='text-center' + (judge.on_duty ? ' warning' : ''))=judge.name
+								th(class=judge.on_duty ? ' warning' : '')=judge.name
 					each story, j in day.stories
 						tr
 							td
@@ -107,7 +107,7 @@ block content
 								| - #{story.display_date} - #{story.last_comment_count} kom.
 							each entry, k in story.comments
 								if !entry.permanent
-									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '') + ' text-center')
+									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : ''))
 										| #{entry.comment_count}
 	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-up')
