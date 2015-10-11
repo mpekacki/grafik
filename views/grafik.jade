@@ -46,7 +46,7 @@ block content
 		| };
 
 		| var options2 = {
-		| title: 'Realizacja normy przez Użytkowników (w procentach)',
+		| title: 'Realizacja normy przez Dyżurnych (w procentach)',
 		| width: 900,
 		| height: 500
 		| };
@@ -69,7 +69,7 @@ block content
 				| Lożownicy
 		li(role='presentation')
 			a(href='#uzytkownicy',aria-controls='uzytkownicy',role='tab',data-toggle='tab')
-				| Użytkownicy
+				| Dyżurni
 	div(class='tab-content')
 		div(role='tabpanel',class='tab-pane fade in active',id='lozownicy',aria-labelledby='lozownicy-tab')
 			table(class='grafik table table-bordered table-hover table-condensed')
@@ -144,7 +144,7 @@ block content
 				tr
 					td(colspan=4)
 						i
-							| Użytkownicy
+							| Dyżurni
 			tr
 				td
 					strong=row.name
