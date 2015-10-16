@@ -1,1 +1,3 @@
-node ./cron.js
+#! /bin/bash
+$PWD > $OPENSHIFT_LOG_DIR/cron_minutely.log
+node cron.js
