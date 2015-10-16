@@ -26,6 +26,9 @@ function removeOutdatedStuff(cb){
 		if(err){cb(err); console.error(err); return;}
 		cb(null);
 	});
+	db.query('DELETE FROM "Stats" WHERE "date" < $1;', [borderDate], function(err, result){
+		
+	});
 }
 
 function getEverything(dateFrom, dateTo, cb){
