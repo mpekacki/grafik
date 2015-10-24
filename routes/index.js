@@ -15,6 +15,15 @@ router.get('/robots.txt', function (req, res) {
     res.send("User-agent: *\nDisallow: /");
 });
 
+router.get('/komentarze/', function (req, res, next){
+  var endDate = new Date();
+  var startDate = moment(new Date()).subtract(process.env.MONTHS, 'months').startOf('month').toDate();
+  core.getCommentStats(startDate, endDate, function(err, stats){
+    if(err) return next(err);
+    res.render('comments', {month: 'wsze czasy (tj. od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY') + ')', stats: stats, history: -1, max_hist: -1 });
+  });
+});
+
 router.get('/komentarze/:history?', function (req, res, next){
   var hist = req.params.history ? +req.params.history : 0;
   if (hist < 0) hist = -hist;
