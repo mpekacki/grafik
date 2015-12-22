@@ -18,9 +18,13 @@ router.get('/robots.txt', function (req, res) {
 router.get('/komentarze/', function (req, res, next){
   var endDate = new Date();
   var startDate = moment(new Date()).subtract(process.env.MONTHS, 'months').startOf('month').toDate();
+  if (req.query.dataod && req.query.datado){
+      startDate = moment(req.query.dataod);
+      endDate = moment(req.query.datado);
+  }
   core.getCommentStats(startDate, endDate, function(err, stats){
     if(err) return next(err);
-    res.render('comments', {month: 'wsze czasy (tj. od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY') + ')', stats: stats, history: -1, max_hist: -1 });
+    res.render('comments', {month: 'okres od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY'), stats: stats, history: -1, max_hist: -1 });
   });
 });
 
@@ -39,15 +43,6 @@ router.get('/komentarze/:history?', function (req, res, next){
   core.getCommentStats(startDate, endDate, function(err, stats){
     if(err) return next(err);
     res.render('comments', {month: moment(endDate).format('MMMM YYYY'), stats: stats, history: hist, max_hist: process.env.MONTHS});
-  });
-});
-
-router.get('/komentarze/:datefrom/:dateto', function (req, res, next){
-  var startDate = moment(req.params.datefrom);
-  var endDate = moment(req.params.dateto);
-  core.getCommentStats(startDate, endDate, function(err, stats){
-    if(err) return next(err);
-    res.render('comments', {month: 'okres od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY'), stats: stats, history: -1, max_hist: -1});
   });
 });
 

@@ -69,5 +69,14 @@ block content
 	br
 	a(href='/komentarze/').
 		Statystyka komentarzy za wszystkie miesiące
+	br
+	form(class='form-inline',role='form',action='/komentarze',method='GET')
+		| Statystyka komentarzy za okres od 
+		input(type='date',class='form-control',name='dataod',value=moment(Date.now()).startOf('month').format('YYYY-MM-DD'))
+		|  do 
+		input(type='date',class='form-control',name='datado',value=moment(Date.now()).format('YYYY-MM-DD'))
+		button(type='submit',class='btn btn-default')
+			| Pokaż
+
 	p.
 		Ostatnia aktualizacja: #{last_updated}
