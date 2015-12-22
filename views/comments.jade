@@ -18,16 +18,20 @@ block content
 		thead
 			tr
 				th.
+					Lp.
+				th.
 					Użytkownik
+				th.
+					Liczba skomentowanych tekstów
 				th.
 					Liczba komentarzy
 				th.
 					W tym pod cudzymi tekstami
-				th.
-					Liczba skomentowanych tekstów
 		tbody
 			each row, r in stats
 				tr
+					td
+						| #{row.rownum}.
 					td
 						if row.active
 							if row.permanent
@@ -39,8 +43,8 @@ block content
 						else
 							| #{row.name}
 					td.
+						#{row.stories_count}
+					td.
 						#{row.comment_count}
 					td.
 						#{row.others_count}
-					td.
-						#{row.stories_count}

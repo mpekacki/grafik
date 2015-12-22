@@ -274,7 +274,7 @@ function updateStoriesIndex(nfids, judges, topDate, bottomDate, dateFrom, cb, pa
 }
 
 function getCommentStats(dateFrom, dateTo, cb){
-	db.query('SELECT "name", SUM("comment_count") AS "comment_count", SUM(CASE WHEN "author"<>"name" THEN "comment_count" ELSE 0 END) AS "others_count", COUNT("nf_id") AS "stories_count", "active", "permanent" FROM "StoriesJudgesComments" INNER JOIN "Judges" ON "JudgeId"="id" INNER JOIN "Stories" ON "StoryId"="nf_id" WHERE "date" BETWEEN $1 AND $2 GROUP BY "name", "active", "permanent" ORDER BY "comment_count" DESC;',
+	db.query('SELECT row_number() OVER (ORDER BY "stories_count" DESC) as "rownum", * FROM (SELECT "name", COUNT("nf_id") AS "stories_count", SUM("comment_count") AS "comment_count", SUM(CASE WHEN "author"<>"name" THEN "comment_count" ELSE 0 END) AS "others_count", "active", "permanent" FROM "StoriesJudgesComments" INNER JOIN "Judges" ON "JudgeId"="id" INNER JOIN "Stories" ON "StoryId"="nf_id" WHERE "date" BETWEEN $1 AND $2 GROUP BY "name", "active", "permanent" ORDER BY "stories_count" DESC) as "stats";',
 		[dateFrom, dateTo],
 		function(err, result){
 			if (err) { cb(err); console.error(err); return; }
