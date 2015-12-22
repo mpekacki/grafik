@@ -1,114 +1,30 @@
 extends layout
 
 block content
-	script(src='https://www.google.com/jsapi')
-	script
-		| google.load('visualization', '1', {packages: ['corechart']});
-		| google.setOnLoadCallback(drawChart);
-
-		| function drawChart() {
-
-		| var data = new google.visualization.DataTable();
-		| var data2 = new google.visualization.DataTable();
-		| data.addColumn('string', 'Miesiąc');
-		| data2.addColumn('string', 'Miesiąc');
-		|  
-		each row, i in fullSummary[0].rows
-			if row.permanent
-				| data.addColumn('number', '#{ row.name }');
-				|  
-			else
-				| data2.addColumn('number', '#{ row.name }');
-				| 
-
-		| data.addRows([
-		each month, i in fullSummary
-			| ['#{ month.name }'
-			each row, j in month.rows
-				if row.permanent
-					| ,#{ row.quota_percent }
-			| ],
-		| ]);
-
-		| data2.addRows([
-		each month, i in fullSummary
-			| ['#{ month.name }'
-			each row, j in month.rows
-				if !row.permanent
-					| ,#{ row.quota_percent }
-			| ],
-		| ]);
-
-		| var options = {
-		| title: 'Realizacja normy przez Lożę (w procentach)',
-		| width: 900,
-		| height: 500
-		| };
-
-		| var options2 = {
-		| title: 'Realizacja normy przez Dyżurnych (w procentach)',
-		| width: 900,
-		| height: 500
-		| };
-
-		| var chart = new google.visualization.LineChart(document.getElementById('wykres_loza'));
-		| var chart2 = new google.visualization.LineChart(document.getElementById('wykres_uzytkownicy'));
-
-		| chart.draw(data, options);
-		| chart2.draw(data2, options2);
-		| }
 	if secret
 		p(class='text-muted')
 			| #{secret}
 	a(href='#podsumowanie',name='top',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-down')
 		| &nbsp;do podsumowania
-	ul(class='nav nav-tabs',role='tablist')
-		li(role='presentation',class='active')
-			a(href='#lozownicy',aria-controls='lozownicy',role='tab',data-toggle='tab')
-				| Lożownicy
-		li(role='presentation')
-			a(href='#uzytkownicy',aria-controls='uzytkownicy',role='tab',data-toggle='tab')
-				| Dyżurni
-	div(class='tab-content')
-		div(role='tabpanel',class='tab-pane fade in active',id='lozownicy',aria-labelledby='lozownicy-tab')
-			table(class='grafik table table-bordered table-hover table-condensed')
-				each day, i in days
-					tr(class='active')
-						th
-							h3=day.display_day
-						each judge, x in day.stories[0].comments
-							if judge.permanent
-								th(class=judge.on_duty ? ' warning' : '')=judge.name
-					each story, j in day.stories
-						tr
-							td
-								| #{story.author} - 
-								a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
-								| - #{story.display_date} - #{story.last_comment_count} kom.
-							each entry, k in story.comments
-								if entry.permanent
-									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : ''))
-										| #{entry.comment_count}
-		div(role='tabpanel',class='tab-pane fade',id='uzytkownicy',aria-labelledby='uzytkownicy-tab')
-			table(class='grafik table table-bordered table-hover table-condensed')
-				each day, i in days
-					tr(class='active')
-						th
-							h3=day.display_day
-						each judge, x in day.stories[0].comments
-							if !judge.permanent
-								th(class=judge.on_duty ? ' warning' : '')=judge.name
-					each story, j in day.stories
-						tr
-							td
-								| #{story.author} - 
-								a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
-								| - #{story.display_date} - #{story.last_comment_count} kom.
-							each entry, k in story.comments
-								if !entry.permanent
-									td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : ''))
-										| #{entry.comment_count}
+	table(class='grafik table table-bordered table-hover table-condensed')
+		each day, i in days
+			tr(class='active')
+				th
+					h3=day.display_day
+				each judge, x in day.stories[0].comments
+					if !judge.permanent && judge.on_duty
+						th(class=judge.on_duty ? ' warning' : '')=judge.name
+			each story, j in day.stories
+				tr
+					td
+						| #{story.author} - 
+						a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
+						| - #{story.display_date} - #{story.last_comment_count} kom.
+					each entry, k in story.comments
+						if !entry.permanent && entry.on_duty
+							td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : ''))
+								| #{entry.comment_count}
 	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-up')
 	h4
@@ -137,14 +53,8 @@ block content
 		tr
 			td(colspan=4)
 				i
-					| Nożownicy
+					| Dyżurni
 		each row, r in summary.rows
-			if !row.permanent && !nonPermHit
-				-nonPermHit = true
-				tr
-					td(colspan=4)
-						i
-							| Dyżurni
 			tr
 				td
 					strong=row.name
@@ -159,7 +69,5 @@ block content
 	br
 	a(href='/komentarze/').
 		Statystyka komentarzy za wszystkie miesiące
-	div(id='wykres_loza')
-	div(id='wykres_uzytkownicy')
 	p.
 		Ostatnia aktualizacja: #{last_updated}

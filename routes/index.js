@@ -42,6 +42,15 @@ router.get('/komentarze/:history?', function (req, res, next){
   });
 });
 
+router.get('/komentarze/:datefrom/:dateto', function (req, res, next){
+  var startDate = moment(req.params.datefrom);
+  var endDate = moment(req.params.dateto);
+  core.getCommentStats(startDate, endDate, function(err, stats){
+    if(err) return next(err);
+    res.render('comments', {month: 'okres od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY'), stats: stats, history: -1, max_hist: -1});
+  });
+});
+
 /* panel admina, modyfikacja dyżurów */
 router.get('/lubieplacki/:username?', function (req, res, next) {
   if (req.headers['x-forwarded-proto'] == 'http') { 
