@@ -21,6 +21,11 @@ router.get('/komentarze/', function (req, res, next){
   if (req.query.dataod && req.query.datado){
       startDate = moment(req.query.dataod);
       endDate = moment(req.query.datado);
+      if (!startDate.isValid() || !endDate.isValid()){
+          var err = new Error("that shit crazy");
+          err.status = 400;
+          return next(err);
+      }
   }
   core.getCommentStats(startDate, endDate, function(err, stats){
     if(err) return next(err);
