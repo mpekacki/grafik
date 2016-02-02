@@ -10,6 +10,10 @@ CREATE TABLE "Stats" ("ip" TEXT, "page" TEXT, "protocol" TEXT, "date" TIMESTAMP 
 
 CREATE TABLE "Snapshots" ("year" INTEGER NOT NULL, "month" INTEGER NOT NULL, "date_of_update" TIMESTAMP WITHOUT TIME ZONE, "content" JSON NOT NULL, PRIMARY KEY("year", "month"));
 
+CREATE TABLE "Contests" ("id" SERIAL, "name" TEXT NOT NULL UNIQUE, "included" BOOLEAN NOT NULL, PRIMARY KEY ("id"));
+
+CREATE TABLE "ContestsStories" ("contest_id" INTEGER REFERENCES "Contests" ("id") ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, "story_id" INTEGER REFERENCES "Stories" ("nf_id"), PRIMARY KEY ("contest_id", "story_id"));
+
 INSERT INTO "Stories" ("nf_id", "author", "title", "date") VALUES (12924, 'Michal2006', 'Smok ekolog', '2015-01-14 13:30');
 
 SELECT "name", SUM("comment_count") AS "count", SUM(CASE WHEN "author"="name" THEN "comment_count" ELSE 0 END) AS "own_count", COUNT("nf_id") AS "stories", "active", "permanent" FROM "StoriesJudgesComments" INNER JOIN "Judges" ON "JudgeId"="id" INNER JOIN "Stories" ON "StoryId"="nf_id" WHERE "date" BETWEEN '2015-06-01' AND '2015-06-30' GROUP BY "name", "active", "permanent" ORDER BY "count" DESC LIMIT 25;

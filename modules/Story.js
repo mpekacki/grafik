@@ -12,6 +12,7 @@ Story.prototype.createFromElement = function(listaElement){
 	this.lastCommentCount = extractCommentCount(listaElement);
 	this.lastUpdated = null;
 	this.applicable = checkIfApplicable(listaElement);
+	this.contest = extractContest(listaElement);
 }
 
 Story.prototype.createFromDatabase = function(_nfid,cb){
@@ -41,7 +42,28 @@ Story.prototype.insert = function (cb){
 		[this.nfid, this.author, this.title, this.date, this.lastCommenter, this.lastCommentCount],
 		function(err, result){
 			if (err) { cb(err); console.error(err); return; }
-			cb(null, story);
+			if (story.contest){
+				db.query('INSERT INTO "Contests" ("name", "included") SELECT $1, $2 WHERE NOT EXISTS (SELECT "id" FROM "Contests" WHERE "name" = $1);',
+					[story.contest, true],
+					function(err,result2){
+						if (err) { cb(err); console.error(err); return; }
+						db.query('SELECT "id" FROM "Contests" WHERE "name" = $1;',
+							[story.contest],
+							function(err,result3){
+								if (err) { cb(err); console.error(err); return; }
+								var contestId = result3.rows[0].id;
+								db.query('INSERT INTO "ContestsStories" ("contest_id", "story_id") VALUES ($1, $2);',
+									[contestId, story.nfid],
+									function(err, result4){
+										if (err) { cb(err); console.error(err); return; }
+										cb(null, story);
+									});
+							});
+					});
+			}
+			else{
+				cb(null, story);
+			}
 		}
 	);
 }
@@ -139,6 +161,11 @@ function extractCommentCount(listaElement){
 	var pattern = /\d+/;
 	var match = pattern.exec(listaElement.find('div[title="komentarze"]').html());
 	return +match[0];
+}
+
+function extractContest(listaElement){
+	var konkurs = listaElement.find('.konkurs').html();
+	return konkurs ? konkurs : null;
 }
 
 function checkIfApplicable(listaElement){

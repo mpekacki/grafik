@@ -1,5 +1,5 @@
 var pg = require('pg');
-var log = (process.env.ENV === 'development');
+var log = (process.env.ENV === 'developmen');
 
 module.exports = {
 	init: function(dbUrl){
@@ -17,6 +17,8 @@ module.exports = {
 				console.log(text + values);
 			client.query(text, values, function(err, result){
 				done();
+				if (err)
+					err.query = text;
 				cb(err, result);
 			});
 		});
