@@ -12,8 +12,8 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+var port = 8080;
+var ipaddress = "0.0.0.0";
 app.set('port', port);
 
 /**
