@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 
 var db = require('./modules/db');
-db.init(process.env.OPENSHIFT_POSTGRESQL_DB_URL);
+db.init(process.env.DATABASE_URL);
 var core = require('./modules/core');
 var stats = require('./modules/stats');
 
