@@ -19,7 +19,7 @@
     "moment": "^2.9.0",
     "morgan": "~1.5.1",
     "pg": "^4.2.0",
-    "request": "^2.53.0",
+    "request": "2.81.0",
     "serve-favicon": "~2.2.0"
   }
 }
