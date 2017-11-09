@@ -23,7 +23,7 @@ block content
 						| - #{story.display_date} - #{story.last_comment_count} kom.
 					each entry, k in story.comments
 						if !entry.permanent && entry.on_duty
-							td(class=(entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : ''))
+							td(class=(story.excluded ? 'warning' : (entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '')))
 								| #{entry.comment_count}
 	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-up')
