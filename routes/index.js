@@ -63,8 +63,8 @@ router.get('/lubieplacki/:username?', function (req, res, next) {
     core.getStoriesForDates(startDate, endDate, function(err, stories){
       var excludedStories = [];
       for (var iStory = 0; iStory < stories.length; ++iStory) {
-        if (story.excluded) {
-          excludedStories.push(story);
+        if (stories[iStory].excluded) {
+          excludedStories.push(stories[iStory]);
         }
       }
       res.render('admin', {osoby: result, selectedUser: req.params.username, stories: stories, excluded_stories: excludedStories});
