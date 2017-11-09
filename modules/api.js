@@ -99,5 +99,12 @@ module.exports = {
 					}
 				}
 			});
+	},
+	toggleStory: function(nfid, cb){
+		db.query('UPDATE "Stories" SET "excluded" = NOT "excluded" WHERE "nf_id" = $1', 
+			[nfid],
+			function(err,result){
+				cb(null);
+		});
 	}
 };

@@ -57,8 +57,18 @@ router.get('/lubieplacki/:username?', function (req, res, next) {
       res.redirect('https://' + req.headers.host + req.path);
   } 
 
+  var endDate = new Date();
+  var startDate = moment(new Date()).subtract(process.env.MONTHS, 'months').startOf('month').toDate();
   core.getJudges(function(err,result){
-    res.render('admin', {osoby: result, selectedUser: req.params.username});
+    core.getStoriesForDates(startDate, endDate, function(err, stories){
+      var excludedStories = [];
+      for (var iStory = 0; iStory < stories.length; ++iStory) {
+        if (story.excluded) {
+          excludedStories.push(story);
+        }
+      }
+      res.render('admin', {osoby: result, selectedUser: req.params.username, stories: stories, excluded_stories: excludedStories});
+    });
   });
 });
 
@@ -82,6 +92,22 @@ router.post('/api/dyzury', function (req, res, next){
 router.get('/api/dyzury/:username', function(req, res, next){
   api.getDuties(req.params.username, function(err, duties){
     res.send(duties);
+  });
+});
+
+router.post('/api/stories/', function(req, res,next){
+  if (req.headers['x-forwarded-proto'] == 'http') { 
+    res.redirect('https://' + req.headers.host + req.path);
+  }
+
+  if(req.body.klucz !== process.env.KLUCZ){
+    var err = new Error("BZZT! Wrong authorization key! Dispatching security forces. Have a nice day.");
+    err.status = 401;
+    return next(err);
+  }
+
+  api.toggleStory(req.body.nfid, function(err) {
+    res.redirect('/lubieplacki/');
   });
 });
 
