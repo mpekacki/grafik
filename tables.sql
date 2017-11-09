@@ -1,4 +1,4 @@
-CREATE TABLE "Stories" ("nf_id" INTEGER NOT NULL, "author" VARCHAR(255) NOT NULL, "title" VARCHAR(255) NOT NULL, "date" TIMESTAMP WITHOUT TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITHOUT TIME ZONE, "last_commenter" VARCHAR(255), "last_comment_count" SMALLINT, PRIMARY KEY ("nf_id"));
+CREATE TABLE "Stories" ("nf_id" INTEGER NOT NULL, "author" VARCHAR(255) NOT NULL, "title" VARCHAR(255) NOT NULL, "date" TIMESTAMP WITHOUT TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITHOUT TIME ZONE, "last_commenter" VARCHAR(255), "last_comment_count" SMALLINT, "excluded" BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY ("nf_id"));
 
 CREATE TABLE "Judges" ("id" SERIAL, "name" VARCHAR(255) NOT NULL, "active" BOOLEAN NOT NULL, "permanent" BOOLEAN NOT NULL, PRIMARY KEY ("id"));
 

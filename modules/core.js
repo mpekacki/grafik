@@ -292,5 +292,6 @@ function getJudges(cb){
 module.exports = {
 	completeRun: completeRun,
 	getCommentStats: getCommentStats,
-	getJudges: getJudges
+	getJudges: getJudges,
+	getStoriesForDates: getStoriesForDates
 };
