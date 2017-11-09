@@ -17,7 +17,7 @@ block content
 						th(class=judge.on_duty ? ' warning' : '')=judge.name
 			each story, j in day.stories
 				tr
-					td
+					td(class=(story.excluded ? 'warning' : ''))
 						| #{story.author} - 
 						a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
 						| - #{story.display_date} - #{story.last_comment_count} kom.
