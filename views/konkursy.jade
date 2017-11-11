@@ -1,9 +1,9 @@
 extends layout
 
 block content
-	table(class='table table-bordered table-hover table-condensed')
-		each contest, i in contests
-			tr
+    table(class='table table-bordered table-hover table-condensed')
+        each contest, i in contests
+            tr
                 td
                     a(href='/konkurs' + contest.id)
                         | #{contest.name}
