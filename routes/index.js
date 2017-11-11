@@ -33,6 +33,13 @@ router.get('/komentarze/', function (req, res, next){
   });
 });
 
+router.get('/konkurs/:id', function(req,res,next){
+  var contestId = +req.params.id;
+  core.getContestChart(contestId, function(err,result){
+    res.render('grafik', {days:result});
+  });
+});
+
 router.get('/komentarze/:history?', function (req, res, next){
   var hist = req.params.history ? +req.params.history : 0;
   if (hist < 0) hist = -hist;

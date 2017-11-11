@@ -102,6 +102,24 @@ function getChart(dateFrom, dateTo, cb) {
 	}while(startOfDay >= fromTemp);
 }
 
+function getContestChart(contestId, cb) {
+	var callsToDo = 0;
+	var result = [];
+	getStoriesForContest(contestId, function(err, stories){
+		var locResult = [];
+		var locCallsToDo = stories.length;
+		callsToDo += locCallsToDo;
+		for (var iStory = 0; iStory < stories.length; ++iStory){
+			getTableRowsForStory(stories[iStory], function(err,rows, story){
+				--locCallsToDo;
+				locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name});
+				if(locCallsToDo === 0) {locResult.sort(locResSort); result.push({"day": story.date.toISOString().slice(0,-14), "display_day": moment(story.date).format('D MMMM YYYY, dddd'), "stories": locResult});callsToDo -= stories.length;}
+				if(callsToDo === 0){result.sort(resSort); cb(null, result);}
+			});
+		}
+	});
+}
+
 function getSummary(dateFrom, dateTo, cb){
 	db.query('WITH total AS (WITH summary AS (WITH comments AS (SELECT "Judges"."id", "Judges"."name", "nf_id", "date", "permanent", "excluded" FROM "Judges", "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id"  WHERE "date" BETWEEN $1 AND $2 AND "active" = true AND ("included" = true OR "included" IS NULL)) SELECT comments."name", sum(CASE WHEN EXTRACT (DOW FROM comments."date") = "day_of_week" AND comments."date" BETWEEN "Duties"."from" AND COALESCE("Duties"."to", \'2099-12-31\') AND comments."excluded" = false THEN 1 ELSE 0 END) > 0 AS "on_duty", COALESCE("comment_count", 0) AS "comment_count", comments."permanent" FROM comments LEFT JOIN "StoriesJudgesComments" AS p ON p."StoryId" = comments."nf_id" AND p."JudgeId" = comments."id" INNER JOIN "Duties" ON "Duties"."JudgeId" = comments."id" GROUP BY comments."name", "comment_count", comments."nf_id", comments."permanent") SELECT "name", sum(CASE WHEN "on_duty" AND "comment_count" > 0 THEN 1 ELSE 0 END) AS "quota_done", sum(CASE WHEN "on_duty" THEN 1 ELSE 0 END) AS "quota_total", sum(CASE WHEN NOT "on_duty" AND "comment_count" > 0 THEN 1 ELSE 0 END) AS "hobby_done", sum(CASE WHEN NOT "on_duty" THEN 1 ELSE 0 END) AS "hobby_total", "permanent" FROM summary GROUP BY "name", "permanent" ORDER BY "permanent" DESC, "name" ASC) SELECT "name", "quota_done", "quota_total", CASE WHEN "quota_total" = 0 THEN 100 ELSE round("quota_done"::float / "quota_total" * 100) END AS "quota_percent", "hobby_done", "hobby_total", CASE WHEN "hobby_total" = 0 THEN 100 ELSE round("hobby_done"::float / "hobby_total" * 100) END AS "hobby_percent", "quota_done" + "hobby_done" AS "all_done", "quota_total" + "hobby_total" AS "all_total", CASE WHEN ("quota_total" + "hobby_total") = 0 THEN 100 ELSE round(("quota_done" + "hobby_done")::float / ("quota_total" + "hobby_total") * 100) END AS "all_percent", "permanent" FROM total;',
 		[dateFrom.toISOString(), dateTo.toISOString()],
@@ -142,6 +160,15 @@ function getStoriesForDates(dateFrom, dateTo, cb){
 			cb(null, result.rows);
 		});
 };
+
+function getContestStories(contestId, cb){
+	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded", "Contests"."name" AS "contest_name" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "Contests"."id" = $1 ORDER BY "Stories"."date" DESC;',
+	[contestId],
+	function(err,result){
+		if(err) {console.error(err); cb(err); return;}
+		cb(null, result.rows);
+	});
+}
 
 function getTableRowsForStory(story, cb){
 	db.query('WITH comments AS (SELECT "Judges"."id", "comment_count", "date" FROM "Stories" INNER JOIN "StoriesJudgesComments" ON "Stories"."nf_id" = "StoriesJudgesComments"."StoryId" INNER JOIN "Judges" ON "StoriesJudgesComments"."JudgeId" = "Judges"."id" WHERE "nf_id" = $1 AND "active" = true) SELECT "Judges"."name", COALESCE(comments."comment_count", 0) AS "comment_count", sum(CASE WHEN EXTRACT(DOW FROM "Stories"."date") = "day_of_week" AND ("Stories"."date" BETWEEN "Duties"."from" AND COALESCE("Duties"."to", \'2099-12-31\')) THEN 1 ELSE 0 END) > 0 AS "on_duty", "permanent" FROM "Stories", "Judges" LEFT JOIN comments ON "Judges"."id" = comments."id" LEFT JOIN "Duties" ON "Judges"."id" = "Duties"."JudgeId" WHERE "Stories"."nf_id" = $1 AND "active" = true GROUP BY "name", "comment_count", "permanent" ORDER BY "permanent" DESC, "name" ASC;',
@@ -293,5 +320,6 @@ module.exports = {
 	completeRun: completeRun,
 	getCommentStats: getCommentStats,
 	getJudges: getJudges,
-	getStoriesForDates: getStoriesForDates
+	getStoriesForDates: getStoriesForDates,
+	getContestChart: getContestChart
 };
