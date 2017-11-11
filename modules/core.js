@@ -135,7 +135,7 @@ function resSort(a,b){
 }
 
 function getStoriesForDates(dateFrom, dateTo, cb){
-	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded", "Contest"."name" AS "contest_name" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "date" >= $1 AND "date" < $2 AND ("included" = true OR "included" IS NULL) ORDER BY "Stories"."date" DESC;',
+	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded", "Contests"."name" AS "contest_name" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "date" >= $1 AND "date" < $2 AND ("included" = true OR "included" IS NULL) ORDER BY "Stories"."date" DESC;',
 		[moment(dateFrom).format(), moment(dateTo).format()],
 		function(err,result){
 			if(err) {console.error(err); cb(err); return;}
