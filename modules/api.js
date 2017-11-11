@@ -106,5 +106,12 @@ module.exports = {
 			function(err,result){
 				cb(null);
 		});
+	},
+	toggleContest: function(contestId, cb) {
+		db.query('UPDATE "Contests" SET "included" = NOT "included" WHERE "id" = $1',
+			[contestId],
+			function(err,result){
+				cb(null);
+		});
 	}
 };

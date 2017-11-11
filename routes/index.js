@@ -88,7 +88,15 @@ router.get('/lubieplacki/:username?', function (req, res, next) {
           excludedStories.push(stories[iStory]);
         }
       }
-      res.render('admin', {osoby: result, selectedUser: req.params.username, stories: stories, excluded_stories: excludedStories});
+      core.getContests(function(err,contests){
+        var excludedContests = [];
+        for (var iContest = 0; iContest < contests.length; ++iContest){
+          if (!contests[iContest].included) {
+            excludedContests.push(contests[iContest]);
+          }
+        }
+        res.render('admin', {osoby: result, selectedUser: req.params.username, stories: stories, excluded_stories: excludedStories, contests: contests, excluded_contests: excludedContests});        
+      });
     });
   });
 });
@@ -121,13 +129,39 @@ router.post('/api/stories/', function(req, res,next){
     res.redirect('https://' + req.headers.host + req.path);
   }
 
-  if(req.body.klucz !== process.env.KLUCZ){
+  if(req.body.klucz !== process.env.KLUCZ || process.env.ATTEMPTS > 20){
+    if (!process.env.ATTEMPTS) {
+      process.env.ATTEMPTS = 1;
+    } else {
+      process.env.ATTEMPTS++;
+    }
     var err = new Error("BZZT! Wrong authorization key! Dispatching security forces. Have a nice day.");
     err.status = 401;
     return next(err);
   }
 
   api.toggleStory(req.body.nfid, function(err) {
+    res.redirect('/lubieplacki/');
+  });
+});
+
+router.post('/api/contests/', function(req, res,next){
+  if (req.headers['x-forwarded-proto'] == 'http') { 
+    res.redirect('https://' + req.headers.host + req.path);
+  }
+
+  if(req.body.klucz !== process.env.KLUCZ || process.env.ATTEMPTS > 20){
+    if (!process.env.ATTEMPTS) {
+      process.env.ATTEMPTS = 1;
+    } else {
+      process.env.ATTEMPTS++;
+    }
+    var err = new Error("BZZT! Wrong authorization key! Dispatching security forces. Have a nice day.");
+    err.status = 401;
+    return next(err);
+  }
+
+  api.toggleContest(req.body.contestid, function(err) {
     res.redirect('/lubieplacki/');
   });
 });
