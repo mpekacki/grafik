@@ -36,7 +36,7 @@ router.get('/komentarze/', function (req, res, next){
 router.get('/konkursy', function(req,res,next){
   core.getContests(function(err,contests) {
     if (err) return next(err);
-    res.render('konkursy', {contests: contests});
+    res.render('konkursy', {title: "Konkursy", contests: contests});
   });
 });
 
