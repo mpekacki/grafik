@@ -35,7 +35,7 @@ router.get('/komentarze/', function (req, res, next){
 
 router.get('/konkurs/:id', function(req,res,next){
   var contestId = +req.params.id;
-  if (isNan(contestId)) {
+  if (isNaN(contestId)) {
     var err = new Error("");
     err.status = 400;
     return next(err);
