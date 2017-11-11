@@ -35,8 +35,10 @@ router.get('/komentarze/', function (req, res, next){
 
 router.get('/konkurs/:id', function(req,res,next){
   var contestId = +req.params.id;
-  core.getContestChart(contestId, function(err,result){
-    res.render('konkurs', {title: 'Konkurs', days:result});
+  var endDate = new Date();
+  var startDate = moment(new Date()).subtract(process.env.MONTHS, 'months').startOf('month').toDate();
+  core.getContestChart(contestId, startDate, endDate, function(err,result){
+    res.render('konkurs', {title: 'Konkurs "' + result[0].stories[0].contest_name +'"', days:result});
   });
 });
 

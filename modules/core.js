@@ -102,22 +102,29 @@ function getChart(dateFrom, dateTo, cb) {
 	}while(startOfDay >= fromTemp);
 }
 
-function getContestChart(contestId, cb) {
+function getContestChart(contestId, dateFrom, dateTo, cb) {
+	var startOfDay = moment(dateTo).startOf('day');
 	var callsToDo = 0;
 	var result = [];
-	getContestStories(contestId, function(err, stories){
-		var locResult = [];
-		var locCallsToDo = stories.length;
-		callsToDo += locCallsToDo;
-		for (var iStory = 0; iStory < stories.length; ++iStory){
-			getTableRowsForStory(stories[iStory], function(err,rows, story){
-				--locCallsToDo;
-				locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name});
-				if(locCallsToDo === 0) {locResult.sort(locResSort); result.push({"day": story.date.toISOString().slice(0,-14), "display_day": moment(story.date).format('D MMMM YYYY, dddd'), "stories": locResult});callsToDo -= stories.length;}
-				if(callsToDo === 0){result.sort(resSort); cb(null, result);}
-			});
-		}
-	});
+	var fromTemp = moment(dateFrom).startOf('day');
+	do{
+		var endOfDay = moment(startOfDay).endOf('day');
+		getContestStoriesForDates(contestId, startOfDay.toDate(), endOfDay.toDate(), function(err, stories){
+			var locResult = [];
+			var locCallsToDo = stories.length;
+			callsToDo += locCallsToDo;
+			for (var iStory = 0; iStory < stories.length; ++iStory){
+				getTableRowsForStory(stories[iStory], function(err,rows, story){
+					--locCallsToDo;
+					locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name, "contest_id": story.contest_id});
+					if(locCallsToDo === 0) {locResult.sort(locResSort); result.push({"day": story.date.toISOString().slice(0,-14), "display_day": moment(story.date).format('D MMMM YYYY, dddd'), "stories": locResult});callsToDo -= stories.length;}
+					if(callsToDo === 0){result.sort(resSort); cb(null, result);}
+				});
+			}
+		});
+
+		startOfDay.subtract(1, 'days');
+	}while(startOfDay >= fromTemp);
 }
 
 function getSummary(dateFrom, dateTo, cb){
@@ -161,14 +168,14 @@ function getStoriesForDates(dateFrom, dateTo, cb){
 		});
 };
 
-function getContestStories(contestId, cb){
-	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded", "Contests"."name" AS "contest_name" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "Contests"."id" = $1 ORDER BY "Stories"."date" DESC;',
-	[contestId],
-	function(err,result){
-		if(err) {console.error(err); cb(err); return;}
-		cb(null, result.rows);
-	});
-}
+function getContestStoriesForDates(contestId, dateFrom, dateTo, cb){
+	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded", "Contests"."name" AS "contest_name", "Contests"."id" as "contest_id" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "date" >= $1 AND "date" < $2 AND ("Contests"."id" = $3) ORDER BY "Stories"."date" DESC;',
+		[moment(dateFrom).format(), moment(dateTo).format(), contestId],
+		function(err,result){
+			if(err) {console.error(err); cb(err); return;}
+			cb(null, result.rows);
+		});
+};
 
 function getTableRowsForStory(story, cb){
 	db.query('WITH comments AS (SELECT "Judges"."id", "comment_count", "date" FROM "Stories" INNER JOIN "StoriesJudgesComments" ON "Stories"."nf_id" = "StoriesJudgesComments"."StoryId" INNER JOIN "Judges" ON "StoriesJudgesComments"."JudgeId" = "Judges"."id" WHERE "nf_id" = $1 AND "active" = true) SELECT "Judges"."name", COALESCE(comments."comment_count", 0) AS "comment_count", sum(CASE WHEN EXTRACT(DOW FROM "Stories"."date") = "day_of_week" AND ("Stories"."date" BETWEEN "Duties"."from" AND COALESCE("Duties"."to", \'2099-12-31\')) THEN 1 ELSE 0 END) > 0 AS "on_duty", "permanent" FROM "Stories", "Judges" LEFT JOIN comments ON "Judges"."id" = comments."id" LEFT JOIN "Duties" ON "Judges"."id" = "Duties"."JudgeId" WHERE "Stories"."nf_id" = $1 AND "active" = true GROUP BY "name", "comment_count", "permanent" ORDER BY "permanent" DESC, "name" ASC;',
