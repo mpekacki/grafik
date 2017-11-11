@@ -22,8 +22,9 @@ block content
 						a(href='http://www.fantastyka.pl/opowiadania/pokaz/' + story.id) #{story.title} 
 						| - #{story.display_date} - #{story.last_comment_count} kom. 
 						if story.contest_name != null
-							span(class='label label-success')
-								| #{story.contest_name}
+							a(href='/konkurs/' + story.contest_id)
+								span(class='label label-success')
+									| #{story.contest_name}
 					each entry, k in story.comments
 						if !entry.permanent && entry.on_duty
 							td(class=(story.excluded ? 'warning' : (entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '')))
