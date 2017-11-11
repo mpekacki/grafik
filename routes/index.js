@@ -36,7 +36,7 @@ router.get('/komentarze/', function (req, res, next){
 router.get('/konkurs/:id', function(req,res,next){
   var contestId = +req.params.id;
   core.getContestChart(contestId, function(err,result){
-    res.render('grafik', {days:result});
+    res.render('konkurs', {title: 'Konkurs', days:result});
   });
 });
 
