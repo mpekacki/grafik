@@ -105,7 +105,7 @@ function getChart(dateFrom, dateTo, cb) {
 function getContestChart(contestId, cb) {
 	var callsToDo = 0;
 	var result = [];
-	getStoriesForContest(contestId, function(err, stories){
+	getContestStories(contestId, function(err, stories){
 		var locResult = [];
 		var locCallsToDo = stories.length;
 		callsToDo += locCallsToDo;
