@@ -33,6 +33,13 @@ router.get('/komentarze/', function (req, res, next){
   });
 });
 
+router.get('/konkursy', function(req,res,next){
+  core.getContests(function(err,contests) {
+    if (err) return next(err);
+    res.render('konkursy', {contests: contests});
+  });
+});
+
 router.get('/konkurs/:id', function(req,res,next){
   var contestId = +req.params.id;
   if (isNaN(contestId)) {

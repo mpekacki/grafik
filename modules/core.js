@@ -202,6 +202,17 @@ function getStoriesThatNeedUpdate(dateFrom, dateTo, cb) {
 	);
 }
 
+function getContests(cb) {
+	db.query('SELECT "id", "name", "included" FROM "Contests" ORDER BY "name" ASC;', [], function(err, result) {
+		if (err) { cb(err); console.error(err); return; }
+		var contests = [];
+		for (var iRow = 0; iRow < result.rows.length; ++iRow){
+			contests.push(result.rows[iRow]);
+		}
+		cb(null, contests);
+	});
+}
+
 function getTopBottomDates(dateFrom, dateTo, cb){
 	db.query('SELECT max("date") AS "top_date", min("date") AS "bottom_date" FROM "Stories" WHERE "date" BETWEEN $1 AND $2;', [dateFrom.toISOString(), dateTo.toISOString()], function(err, result){
 		if(err) { cb(err); console.error(err); return; }
@@ -328,5 +339,6 @@ module.exports = {
 	getCommentStats: getCommentStats,
 	getJudges: getJudges,
 	getStoriesForDates: getStoriesForDates,
-	getContestChart: getContestChart
+	getContestChart: getContestChart,
+	getContests: getContests
 };
