@@ -91,7 +91,7 @@ function getChart(dateFrom, dateTo, cb) {
 			for (var iStory = 0; iStory < stories.length; ++iStory){
 				getTableRowsForStory(stories[iStory], function(err,rows, story){
 					--locCallsToDo;
-					locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name});
+					locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name, "contest_id": story.contest_id});
 					if(locCallsToDo === 0) {locResult.sort(locResSort); result.push({"day": story.date.toISOString().slice(0,-14), "display_day": moment(story.date).format('D MMMM YYYY, dddd'), "stories": locResult});callsToDo -= stories.length;}
 					if(callsToDo === 0){result.sort(resSort); cb(null, result);}
 				});
@@ -112,7 +112,7 @@ function getContestChart(contestId, cb) {
 		for (var iStory = 0; iStory < stories.length; ++iStory){
 			getTableRowsForStory(stories[iStory], function(err,rows, story){
 				--locCallsToDo;
-				locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name, "contest_id": story.contest_id});
+				locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name});
 				if(locCallsToDo === 0) {locResult.sort(locResSort); result.push({"day": story.date.toISOString().slice(0,-14), "display_day": moment(story.date).format('D MMMM YYYY, dddd'), "stories": locResult});callsToDo -= stories.length;}
 				if(callsToDo === 0){result.sort(resSort); cb(null, result);}
 			});
