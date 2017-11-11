@@ -91,7 +91,7 @@ function getChart(dateFrom, dateTo, cb) {
 			for (var iStory = 0; iStory < stories.length; ++iStory){
 				getTableRowsForStory(stories[iStory], function(err,rows, story){
 					--locCallsToDo;
-					locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded});
+					locResult.push({"id" : story.nf_id, "title": story.title, "author": story.author, "date": story.date.toISOString(), "display_date": moment(story.date).format('H:mm'), "last_comment_count" : story.last_comment_count, "comments": rows, "excluded": story.excluded, "contest_name": story.contest_name});
 					if(locCallsToDo === 0) {locResult.sort(locResSort); result.push({"day": story.date.toISOString().slice(0,-14), "display_day": moment(story.date).format('D MMMM YYYY, dddd'), "stories": locResult});callsToDo -= stories.length;}
 					if(callsToDo === 0){result.sort(resSort); cb(null, result);}
 				});
@@ -135,7 +135,7 @@ function resSort(a,b){
 }
 
 function getStoriesForDates(dateFrom, dateTo, cb){
-	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "date" >= $1 AND "date" < $2 AND ("included" = true OR "included" IS NULL) ORDER BY "Stories"."date" DESC;',
+	db.query('SELECT "nf_id", "author", "title", "date", "last_comment_count", "excluded", "Contest"."name" AS "contest_name" FROM "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "date" >= $1 AND "date" < $2 AND ("included" = true OR "included" IS NULL) ORDER BY "Stories"."date" DESC;',
 		[moment(dateFrom).format(), moment(dateTo).format()],
 		function(err,result){
 			if(err) {console.error(err); cb(err); return;}
