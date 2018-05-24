@@ -29,6 +29,9 @@ function removeOutdatedStuff(cb){
 	db.query('DELETE FROM "Stats" WHERE "date" < $1;', [borderDate], function(err, result){
 		
 	});
+	db.query('DELETE FROM "Contests" WHERE "id" IN (SELECT "id" FROM "Contests" LEFT JOIN "ContestsStories" ON "Contests"."id" = "ContestsStories"."contest_id" WHERE "ContestsStories"."contest_id" IS NULL);', [], function(err,result){
+
+	});
 }
 
 function getEverything(dateFrom, dateTo, cb){
