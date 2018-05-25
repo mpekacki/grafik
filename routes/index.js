@@ -188,7 +188,7 @@ router.get('/:history?', function(req, res, next) {
   var secret = Math.random() <= 0.001 ? "Jeśli to czytasz - obudź się. Od ponad dwudziestu lat jesteś w śpiączce. Cały czas usiłujemy Cię wybudzić, lecz bezskutecznie. Próbujemy teraz nowej metody. Mamy nadzieję, że ta wiadomość pojawi się w Twoim śnie. Prosimy, obudź się i wróć do nas. Bardzo nam Ciebie brakuje." : null;
   core.completeRun(startDate, endDate, function(err,result){
     if(err) return next(err);
-  	res.render('grafik', {title: 'Grafik loży NF', days: result.days, summary: result.summary, fullSummary: result.fullSummary, date_from: moment(startDate).format('D MMMM YYYY'), date_to: moment(endDate).format('D MMMM YYYY'), last_updated: moment(result.last_updated).format('LLL'), history: hist, max_hist: process.env.MONTHS, secret: secret});
+  	res.render('grafik', {title: 'Grafik loży NF', days: result.days, summary: result.summary, fullSummary: result.fullSummary, date_from: moment(startDate).format('D MMMM YYYY'), date_to: moment(endDate).format('D MMMM YYYY'), last_updated: moment(result.last_updated).format('LLL'), history: hist, max_hist: process.env.MONTHS, secret: secret, max_columns: result.max_columns});
   });
 });
 
