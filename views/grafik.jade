@@ -18,7 +18,7 @@ block content
 						if !judge.permanent && judge.on_duty
 							th(class=judge.on_duty ? ' warning' : '')=judge.name
 							- n++
-					while n < max_comments
+					while n < max_columns
 						th
 						- n++
 				each story, j in day.stories
@@ -37,7 +37,7 @@ block content
 								td(class=(story.excluded ? 'warning' : (entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '')))
 									| #{entry.comment_count}
 								- m++
-						while m < max_comments
+						while m < max_columns
 							td
 							- m++
 	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
