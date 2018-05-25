@@ -13,9 +13,14 @@ block content
 				tr(class='active')
 					th
 						h3=day.display_day
+					- var n = 0
 					each judge, x in day.stories[0].comments
 						if !judge.permanent && judge.on_duty
 							th(class=judge.on_duty ? ' warning' : '')=judge.name
+							- n++
+					while n < max_comments
+						th
+						- n++
 				each story, j in day.stories
 					tr
 						td(class=(story.excluded ? 'warning' : ''))
@@ -26,10 +31,15 @@ block content
 								a(href='/konkurs/' + story.contest_id)
 									span(class='label label-success')
 										| #{story.contest_name}
+						- var m = 0
 						each entry, k in story.comments
 							if !entry.permanent && entry.on_duty
 								td(class=(story.excluded ? 'warning' : (entry.comment_count > 0 ? (entry.on_duty ? 'info' : 'success') : entry.on_duty ? 'danger' : '')))
 									| #{entry.comment_count}
+								- m++
+						while m < max_comments
+							td
+							- m++
 	a(href='#top',name='podsumowanie',title='do góry',class='btn pull-right')
 		span(class='glyphicon glyphicon-chevron-up')
 	h4

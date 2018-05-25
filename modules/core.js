@@ -44,7 +44,8 @@ function getEverything(dateFrom, dateTo, cb){
 			getLastUpdateDate(dateFrom, dateTo, function(err, date){
 				if(err) {cb(err); console.error(err); return}
 				getSummaryForAllMonths(process.env.MONTHS, [], function(err, fullSummary){
-					cb(null, {days: rows, summary:summary, fullSummary: fullSummary, last_updated: date});
+					var maxColumns = Math.max.apply(Math, rows.map(function(row){return row.stories[0].comments.length;}));
+					cb(null, {days: rows, summary:summary, fullSummary: fullSummary, last_updated: date, max_columns: maxColumns});
 				});
 			});
 		});
