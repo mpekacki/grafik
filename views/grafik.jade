@@ -4,10 +4,10 @@ block content
 	if secret
 		p(class='text-muted')
 			| #{secret}
-	a(href='#podsumowanie',name='top',class='btn pull-right')
-		span(class='glyphicon glyphicon-chevron-down')
-		| &nbsp;do podsumowania
 	div(class='table-responsive')
+		a(href='#podsumowanie',name='top',class='btn pull-right')
+			span(class='glyphicon glyphicon-chevron-down')
+			| &nbsp;do podsumowania
 		table(class='grafik table table-bordered table-hover table-condensed')
 			each day, i in days
 				tr(class='active')
