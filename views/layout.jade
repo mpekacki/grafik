@@ -13,5 +13,11 @@ html
   body
     div(class='container')
       div(class='page-header')
-        h1=title
+        if title=='Grafik loży NF'
+          h1
+            | Grafik Dyżurnych 
+            a(href='http://www.fantastyka.pl/hydepark/pokaz/13016')
+              | Fantastyka.pl
+        else
+          h1=title
       block content
