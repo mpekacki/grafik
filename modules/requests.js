@@ -7,6 +7,9 @@ module.exports = {
 	makeHttpGet : function(url, cb){
 		if (log) console.log('making request to ' + url);
 		request(url, function(err, response, body){
+			if (err) {
+				cb(err);
+			}
 			var $ = cheerio.load(body, { decodeEntities: false });
 			cb(err, $);
 		});
