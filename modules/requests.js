@@ -3,6 +3,7 @@ const https = require('https');
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
 const log = (process.env.ENV === 'development');
+const skipAuthErrors = process.env.SKIP_A === '1';
 
 module.exports = {
 	makeHttpGet : function(url, cb){
@@ -11,13 +12,13 @@ module.exports = {
 
 		agentOptions = {
 		  host: 'www.fantastyka.pl'
-		, rejectUnauthorized: false
+		, rejectUnauthorized: !skipAuthErrors
 		};
 
 		agent = new https.Agent(agentOptions);
 		
 		if (log) console.log('making request to ' + url);
-		request(url, function(err, response, body){
+		request({url: url, agent:agent}, function(err, response, body){
 			if (err) {
 				cb(err);
 				return;
