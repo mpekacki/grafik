@@ -81,7 +81,7 @@ Story.prototype.update = function (judges, cb){
 			});
 			return;
 		}
-		var url = 'http://www.fantastyka.pl/opowiadania/pokaz/' + story.nfid;
+		var url = 'https://www.fantastyka.pl/opowiadania/pokaz/' + story.nfid;
 
 		reqs.makeHttpGet(url, function(err, $){
 			if (err){ cb(err); return; }
