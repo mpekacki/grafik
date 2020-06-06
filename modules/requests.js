@@ -17,7 +17,7 @@ module.exports = {
 		agent = new https.Agent(agentOptions);
 		
 		if (log) console.log('making request to ' + url);
-		request({url: url, agent: agent}, function(err, response, body){
+		request(url, function(err, response, body){
 			if (err) {
 				cb(err);
 				return;
