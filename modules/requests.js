@@ -1,7 +1,8 @@
-var request = require('request');
-var cheerio = require('cheerio');
-var iconv = require('iconv-lite');
-var log = (process.env.ENV === 'development');
+const request = require('request');
+const https = require('https');
+const cheerio = require('cheerio');
+const iconv = require('iconv-lite');
+const log = (process.env.ENV === 'development');
 
 module.exports = {
 	makeHttpGet : function(url, cb){
