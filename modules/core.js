@@ -272,7 +272,7 @@ var finished = false;
 
 function updateStoriesIndex(nfids, judges, topDate, bottomDate, dateFrom, cb, pageNo){
 	pageNo = pageNo || 1;
-	var url = 'http://www.fantastyka.pl/opowiadania/wszystkie/w/w/w/0/d/' + pageNo;
+	var url = 'https://www.fantastyka.pl/opowiadania/wszystkie/w/w/w/0/d/' + pageNo;
 	reqs.makeHttpGet(url, function(err, $){
 		if(err) { cb(err); console.error(err); return; }
 		//na pierwszej stronie są przyklejone tematy, trzeba ich uniknąć
