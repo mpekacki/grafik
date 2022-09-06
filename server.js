@@ -5,7 +5,7 @@
  */
 
 var app = require('./app');
-var debug = require('debug')('grafiknf:server');
+// var debug = require('debug')('grafiknf:server');
 var http = require('http');
 
 /**
@@ -59,5 +59,6 @@ function onError(error) {
  */
 
 function onListening() {
-  debug('Listening on port ' + server.address().port);
+  // debug('Listening on port ' + server.address().port);
+  console.log('Listening on port ' + server.address().port);
 }

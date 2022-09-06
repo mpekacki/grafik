@@ -1,4 +1,5 @@
 var db = require('./db');
+const moment = require('moment');
 
 var days = ['niedziela', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota'];
 
@@ -47,7 +48,7 @@ module.exports = {
 					}
 
 					if (dutiesRows.rows.length > 0){
-						duties.dataod = dutiesRows.rows[0].from.toISOString().substring(0, 10);
+						duties.dataod = moment(dutiesRows.rows[0].from).toISOString().substring(0, 10);
 					}
 
 					cb(null, duties);
@@ -59,7 +60,7 @@ module.exports = {
 
 		var active = 0;
 		var permanent = 0;
-		var dataod = reqBody.dataod || '2015-01-01';
+		var dataod = moment(reqBody.dataod || '2015-01-01').toDate();
 		if (reqBody.rola === "brak"){
 			active = 0;
 			permanent = 0;
@@ -78,7 +79,7 @@ module.exports = {
 			function(err, result){
 				for (var day = 0; day < days.length; ++day){
 					if (reqBody[days[day]] !== undefined){
-						db.query('WITH upsert AS (UPDATE "Duties" SET "from" = $3 FROM "Judges" WHERE "Judges"."id" = "Duties"."JudgeId" AND "day_of_week" = $1 AND "Judges"."name" = $2 RETURNING *) INSERT INTO "Duties" ("day_of_week", "JudgeId", "from") SELECT $1, "id", $3 FROM "Judges" WHERE "name" = $2 AND NOT EXISTS (SELECT * FROM upsert);',
+						db.query('INSERT INTO "Duties" ("day_of_week", "JudgeId", "from") SELECT $1, "id", $3 FROM "Judges" WHERE "name" = $2 ON CONFLICT ("day_of_week", "JudgeId") DO UPDATE SET "from"=excluded."from";',
 						[day, username, dataod],
 						function(err,result){
 							++callbacksNo;
@@ -88,7 +89,7 @@ module.exports = {
 						});
 					}
 					else{
-						db.query('DELETE FROM "Duties" USING "Judges" WHERE "Duties"."JudgeId" = "Judges"."id" AND "day_of_week" = $1 AND "Judges"."name" = $2;',
+						db.query('DELETE FROM "Duties" WHERE "day_of_week" = $1 AND "JudgeId" IN (SELECT "id" FROM "Judges" WHERE "name" = $2);',
 							[day, username],
 								function(err,result){
 								++callbacksNo;

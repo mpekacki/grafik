@@ -29,7 +29,7 @@ router.get('/komentarze/', function (req, res, next){
   }
   core.getCommentStats(startDate, endDate, function(err, stats){
     if(err) return next(err);
-    res.render('comments', {month: 'okres od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY'), stats: stats, history: -1, max_hist: -1 });
+    res.render('comments', {title: 'Komentarze', month: 'okres od ' + moment(startDate).format('D MMMM YYYY') + ' do ' + moment(endDate).format('D MMMM YYYY'), stats: stats, history: -1, max_hist: -1 });
   });
 });
 
@@ -68,7 +68,7 @@ router.get('/komentarze/:history?', function (req, res, next){
   var startDate = moment(endDate).startOf('month').toDate();
   core.getCommentStats(startDate, endDate, function(err, stats){
     if(err) return next(err);
-    res.render('comments', {month: moment(endDate).format('MMMM YYYY'), stats: stats, history: hist, max_hist: process.env.MONTHS});
+    res.render('comments', {title: 'Komentarze', month: moment(endDate).format('MMMM YYYY'), stats: stats, history: hist, max_hist: process.env.MONTHS});
   });
 });
 
@@ -95,7 +95,7 @@ router.get('/lubieplacki/:username?', function (req, res, next) {
             excludedContests.push(contests[iContest]);
           }
         }
-        res.render('admin', {osoby: result, selectedUser: req.params.username, stories: stories, excluded_stories: excludedStories, contests: contests, excluded_contests: excludedContests});        
+        res.render('admin', {title: 'Admin', osoby: result, selectedUser: req.params.username, stories: stories, excluded_stories: excludedStories, contests: contests, excluded_contests: excludedContests});        
       });
     });
   });
@@ -173,6 +173,7 @@ router.post('/api/contests/', function(req, res,next){
 
 /* GET home page. */
 router.get('/:history?', function(req, res, next) {
+  console.log('MONTHS', process.env.MONTHS);
   var hist = req.params.history ? +req.params.history : 0;
   if (hist < 0) hist = -hist;
   if (hist > process.env.MONTHS) {
