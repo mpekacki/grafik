@@ -137,7 +137,125 @@ function getContestChart(contestId, dateFrom, dateTo, cb) {
 }
 
 function getSummary(dateFrom, dateTo, cb){
-	db.query('WITH total AS (WITH summary AS (WITH comments AS (SELECT "Judges"."id", "Judges"."name", "nf_id", "date", "permanent", "excluded" FROM "Judges", "Stories" LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id" LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id"  WHERE "date" BETWEEN $1 AND $2 AND "active" = true AND ("included" = true OR "included" IS NULL)) SELECT comments."name", sum(CASE WHEN CAST (strftime(\'%w\', datetime(comments."date" / 1000, \'unixepoch\')) AS INTEGER) = "day_of_week" AND comments."date" BETWEEN "Duties"."from" AND COALESCE("Duties"."to", \'2099-12-31\') AND comments."excluded" = false THEN 1 ELSE 0 END) > 0 AS "on_duty", COALESCE("comment_count", 0) AS "comment_count", comments."permanent" FROM comments LEFT JOIN "StoriesJudgesComments" AS p ON p."StoryId" = comments."nf_id" AND p."JudgeId" = comments."id" INNER JOIN "Duties" ON "Duties"."JudgeId" = comments."id" GROUP BY comments."name", "comment_count", comments."nf_id", comments."permanent") SELECT "name", sum(CASE WHEN "on_duty" AND "comment_count" > 0 THEN 1 ELSE 0 END) AS "quota_done", sum(CASE WHEN "on_duty" THEN 1 ELSE 0 END) AS "quota_total", sum(CASE WHEN NOT "on_duty" AND "comment_count" > 0 THEN 1 ELSE 0 END) AS "hobby_done", sum(CASE WHEN NOT "on_duty" THEN 1 ELSE 0 END) AS "hobby_total", "permanent" FROM summary GROUP BY "name", "permanent" ORDER BY "permanent" DESC, "name" ASC) SELECT "name", "quota_done", "quota_total", CASE WHEN "quota_total" = 0 THEN 100 ELSE round("quota_done" / "quota_total" * 100) END AS "quota_percent", "hobby_done", "hobby_total", CASE WHEN "hobby_total" = 0 THEN 100 ELSE round("hobby_done" / "hobby_total" * 100) END AS "hobby_percent", "quota_done" + "hobby_done" AS "all_done", "quota_total" + "hobby_total" AS "all_total", CASE WHEN ("quota_total" + "hobby_total") = 0 THEN 100 ELSE round(("quota_done" + "hobby_done") / ("quota_total" + "hobby_total") * 100) END AS "all_percent", "permanent" FROM total;',
+	db.query(`WITH total AS (
+		WITH summary AS (
+			WITH comments AS (
+				SELECT
+					"Judges"."id",
+					"Judges"."name",
+					"nf_id",
+					"date",
+					"permanent",
+					"excluded"
+				FROM
+					"Judges",
+					"Stories"
+					LEFT JOIN "ContestsStories" ON "ContestsStories"."story_id" = "Stories"."nf_id"
+					LEFT JOIN "Contests" ON "Contests"."id" = "ContestsStories"."contest_id"
+				WHERE
+					"date" BETWEEN $1
+					AND $2
+					AND "active" = true
+					AND (
+						"included" = true
+						OR "included" IS NULL
+					)
+			)
+			SELECT
+				comments."name",
+				sum(
+					CASE
+						WHEN CAST (
+							strftime(
+								'%w',
+								datetime(comments."date" / 1000, 'unixepoch')
+							) AS INTEGER
+						) = "day_of_week"
+						AND comments."date" BETWEEN "Duties"."from"
+						AND COALESCE(
+							"Duties"."to",
+							'2099-12-31'
+						)
+						AND comments."excluded" = false THEN 1
+						ELSE 0
+					END
+				) > 0 AS "on_duty",
+				COALESCE("comment_count", 0) AS "comment_count",
+				comments."permanent"
+			FROM
+				comments
+				LEFT JOIN "StoriesJudgesComments" AS p ON p."StoryId" = comments."nf_id"
+				AND p."JudgeId" = comments."id"
+				INNER JOIN "Duties" ON "Duties"."JudgeId" = comments."id"
+			GROUP BY
+				comments."name",
+				"comment_count",
+				comments."nf_id",
+				comments."permanent"
+		)
+		SELECT
+			"name",
+			sum(
+				CASE
+					WHEN "on_duty"
+					AND "comment_count" > 0 THEN 1
+					ELSE 0
+				END
+			) AS "quota_done",
+			sum(
+				CASE
+					WHEN "on_duty" THEN 1
+					ELSE 0
+				END
+			) AS "quota_total",
+			sum(
+				CASE
+					WHEN NOT "on_duty"
+					AND "comment_count" > 0 THEN 1
+					ELSE 0
+				END
+			) AS "hobby_done",
+			sum(
+				CASE
+					WHEN NOT "on_duty" THEN 1
+					ELSE 0
+				END
+			) AS "hobby_total",
+			"permanent"
+		FROM
+			summary
+		GROUP BY
+			"name",
+			"permanent"
+		ORDER BY
+			"permanent" DESC,
+			"name" ASC
+	)
+	SELECT
+		"name",
+		"quota_done",
+		"quota_total",
+		CASE
+			WHEN "quota_total" = 0 THEN 100
+			ELSE round("quota_done" * 1.0 / "quota_total" * 100)
+		END AS "quota_percent",
+		"hobby_done",
+		"hobby_total",
+		CASE
+			WHEN "hobby_total" = 0 THEN 100
+			ELSE round("hobby_done" * 1.0 / "hobby_total" * 100)
+		END AS "hobby_percent",
+		"quota_done" + "hobby_done" AS "all_done",
+		"quota_total" + "hobby_total" AS "all_total",
+		CASE
+			WHEN ("quota_total" + "hobby_total") = 0 THEN 100
+			ELSE round(
+				("quota_done" + "hobby_done") * 1.0 / ("quota_total" + "hobby_total") * 100
+			)
+		END AS "all_percent",
+		"permanent"
+	FROM
+		total;`,
 		[dateFrom, dateTo],
 		function(err,result){
 			if(err){cb(err); console.error(err); return}

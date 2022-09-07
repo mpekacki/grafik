@@ -17,23 +17,33 @@ module.exports = {
 			)
 		);
 		// console.log('query', text, valuesObj);
-		sqlite.open({
-			filename: this.dbUrl,
-			driver: sqlite3.Database
-		}).then((db) => {
-			// if (text.startsWith('INSERT') || text.startsWith('UPDATE') || text.startsWith('UPSERT') || text.startsWith('DELETE') || text.startsWith('WITH s AS')) {
-			// 	return db.run(text, valuesObj);
-			// } else {
-				return db.all(text, valuesObj);
-			// }
-		}).then((result) => {
-			console.log('result', text, valuesObj, result);
-			cb(null, {
-				rows: result
+		if (!this.db) {
+			console.log('opening database');
+			const that = this;
+			sqlite.open({
+				filename: this.dbUrl,
+				driver: sqlite3.Database
+			}).then((db) => {
+				if (!that.db) {
+					that.db = db;
+				}
+				dbQuery(db, text, valuesObj, cb);
 			});
-		}).catch((error) => {
-			console.error('db error', error, text, valuesObj);
-			cb(error);
-		});
+		} else {
+			dbQuery(this.db, text, valuesObj, cb);
+		}
+
 	}
 };
+
+function dbQuery(db, text, valuesObj, cb) {
+	db.all(text, valuesObj).then((result) => {
+		console.log('result', text, valuesObj, result);
+		cb(null, {
+			rows: result
+		});
+	}).catch((error) => {
+		console.error('db error', error, text, valuesObj);
+		cb(error);
+	});
+}
